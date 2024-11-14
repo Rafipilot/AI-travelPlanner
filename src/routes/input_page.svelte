@@ -7,7 +7,8 @@
   let returnDate = "";
   let airports = [];  // Array to store airport data
   let searchTermDeparture = "";  // Search term for departure airport
-  let searchTermDestination = "";  // Search term for destination airport
+  let searchTermDestination = "";  // Search term for destina;ion airport
+  let destination_city = "";
 
   // Fetch airport data from the provided URL
   async function fetchAirports() {
@@ -73,14 +74,19 @@
       returnDate = event.target.value;
   }
 
+  function handleCityDestinationChange(event) {
+    destination_city = event.target.value;
+  }
+
   async function generate(event) {
     const travelData = {
         departure_airport,
         destination_airport,
         number_of_people,
-        budget_range: budgetRange,
+        budget_range: 3000,
         departure_date: departureDate,
-        return_date: returnDate
+        return_date: returnDate,
+        city_destination: destination_city
     };
 
     try {
@@ -153,6 +159,16 @@
           bind:value="{number_of_people}"
       />
   </label>
+
+  <label>
+    Destination city:
+    <input
+        type="str"
+        placeholder="Destionation City"
+        on:input="{handleCityDestinationChange}"
+        bind:value="{destination_city}"
+    />
+</label>
 
   <!-- Budget Range Input -->
   <label>
