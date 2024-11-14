@@ -7,8 +7,9 @@
   let returnDate = "";
   let airports = [];  // Array to store airport data
   let searchTermDeparture = "";  // Search term for departure airport
-  let searchTermDestination = "";  // Search term for destina;ion airport
+  let searchTermDestination = "";  // Search term for destination airport
   let destination_city = "";
+  let apiResponse = null;  // Variable to store API response data
 
   // Fetch airport data from the provided URL
   async function fetchAirports() {
@@ -83,7 +84,7 @@
         departure_airport,
         destination_airport,
         number_of_people,
-        budget_range: 3000,
+        budget_range: 3000, // temp hard coding budget
         departure_date: departureDate,
         return_date: returnDate,
         city_destination: destination_city
@@ -103,11 +104,27 @@
         }
 
         const result = await response.json();
-        console.log("API Response:", result);
+        apiResponse = result.details;  // Store the result details
+        displayApiResponse();  // Update UI with the received data
     } catch (error) {
         console.error("There was a problem with the API request:", error);
     }
-}
+  }
+
+  // Display the API response data in the UI
+  function displayApiResponse() {
+      const responseContainer = document.getElementById("responseContainer");
+      responseContainer.innerHTML = `
+          <h2>API Response</h2>
+          <p><strong>Status:</strong> ${apiResponse ? "Success" : "Failed"}</p>
+          <p><strong>Message:</strong> ${apiResponse?.message || "No data"}</p>
+          <p><strong>AI Response:</strong> ${apiResponse?.openai_response || "N/A"}</p>
+          <p><strong>Total Flight Price:</strong> ${apiResponse?.total_flight_price || "N/A"}</p>
+          <p><strong>Best Hotels:</strong> ${apiResponse?.best_hotels?.join(", ") || "N/A"}</p>
+          <p><strong>Activities:</strong> ${apiResponse?.activities?.join(", ") || "N/A"}</p>
+      `;
+  }
+
   // Run fetchAirports function when the script loads
   fetchAirports();
 </script>
@@ -163,12 +180,12 @@
   <label>
     Destination city:
     <input
-        type="str"
-        placeholder="Destionation City"
+        type="text"
+        placeholder="Destination City"
         on:input="{handleCityDestinationChange}"
         bind:value="{destination_city}"
     />
-</label>
+  </label>
 
   <!-- Budget Range Input -->
   <label>
@@ -204,9 +221,11 @@
   </label>
 
   <label>
-
-    <button on:click="{generate}">Ask your perosnalised AI travel agent</button>
+    <button on:click="{generate}">Ask your personalized AI travel agent</button>
   </label>
+
+  <!-- Container to display the API response -->
+  <div id="responseContainer"></div>
 </main>
 
 <style>
@@ -224,5 +243,12 @@
   input[type="text"] {
       width: 100%;
       padding: 8px;
+  }
+
+  #responseContainer {
+      margin-top: 20px;
+      padding: 10px;
+      border: 1px solid #ccc;
+      background-color: #f9f9f9;
   }
 </style>
