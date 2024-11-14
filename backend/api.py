@@ -365,6 +365,9 @@ def travel_agent():
     lat, lng = get_coords(city_destination)
     hotels = get_hotel_data(city_destination, lat, lng, str(depart_date), str(return_date))
     activities = get_activities(city_destination, lat, lng)
+    activities_to_return = []
+    for i in range(duration):
+        activities_to_return.append(activities[i])
 
     print(departure, destination, depart_date, number_of_people)
     flight, flight_price = get_flight_price(departure, destination, str(depart_date), int(number_of_people))
@@ -413,9 +416,10 @@ def travel_agent():
         "message": "Travel details received",
         "details": {
             "openai_response": openai_response,
+            "airline_name": airline_name,
             "total_flight_price": total_price_flight,
             "best_hotels": best_hotels,
-            "activities": activities,
+            "activities": activities_to_return,
         }
     }
     return jsonify(response)

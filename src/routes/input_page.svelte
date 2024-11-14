@@ -1,4 +1,19 @@
+
+
 <script>
+  import { onMount } from 'svelte';
+
+  onMount(() => {
+    const script = document.createElement('script');
+    script.src = 'https://md-block.verou.me/md-block.js';
+    script.type = 'module';
+    script.onload = () => {
+      // You can now use <md-block> after the script is loaded
+      console.log('md-block script loaded');
+    };
+    document.head.appendChild(script);
+  });
+  
   let destination_airport = "";
   let departure_airport = "";
   let number_of_people = 0;
@@ -113,17 +128,28 @@
 
   // Display the API response data in the UI
   function displayApiResponse() {
-      const responseContainer = document.getElementById("responseContainer");
-      responseContainer.innerHTML = `
-          <h2>API Response</h2>
-          <p><strong>Status:</strong> ${apiResponse ? "Success" : "Failed"}</p>
-          <p><strong>Message:</strong> ${apiResponse?.message || "No data"}</p>
-          <p><strong>AI Response:</strong> ${apiResponse?.openai_response || "N/A"}</p>
-          <p><strong>Total Flight Price:</strong> ${apiResponse?.total_flight_price || "N/A"}</p>
-          <p><strong>Best Hotels:</strong> ${apiResponse?.best_hotels?.join(", ") || "N/A"}</p>
-          <p><strong>Activities:</strong> ${apiResponse?.activities?.join(", ") || "N/A"}</p>
-      `;
-  }
+    const responseContainer = document.getElementById("responseContainer");
+
+    responseContainer.innerHTML = `
+        <h2>Your Travel Plan</h2>
+        <md-block>
+            <strong>AI Response:</strong>
+            <div>${apiResponse?.openai_response}</div>
+        </md-block>
+        <p><strong>Total Flight Price:</strong> ${apiResponse?.total_flight_price || "N/A"}</p>
+        <p><strong>Best Hotels:</strong> ${apiResponse?.best_hotels?.join(", ") || "N/A"}</p>
+        <p><strong>Activities:</strong> ${apiResponse?.activities?.join(", ") || "N/A"}</p>
+    `;
+
+    // Re-initialize the md-block after setting innerHTML
+    const mdBlockScript = document.createElement('script');
+    mdBlockScript.src = 'https://md-block.verou.me/md-block.js';
+    mdBlockScript.type = 'module';
+    mdBlockScript.onload = () => {
+        console.log('md-block script reloaded and applied.');
+    };
+    document.head.appendChild(mdBlockScript);
+}
 
   // Run fetchAirports function when the script loads
   fetchAirports();
