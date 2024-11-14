@@ -73,10 +73,35 @@
       returnDate = event.target.value;
   }
 
-  function generate(event)  {
-    console.log("API Call Inputs")
-    console.log(destination_airport, departure_airport, number_of_people, budgetRange, departureDate, returnDate, searchTermDeparture, searchTermDestination)
-  }
+  async function generate(event) {
+    const travelData = {
+        departure_airport,
+        destination_airport,
+        number_of_people,
+        budget_range: budgetRange,
+        departure_date: departureDate,
+        return_date: returnDate
+    };
+
+    try {
+        const response = await fetch("http://127.0.0.1:5000/api/travel", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json"
+            },
+            body: JSON.stringify(travelData)
+        });
+
+        if (!response.ok) {
+            throw new Error("Network response was not ok");
+        }
+
+        const result = await response.json();
+        console.log("API Response:", result);
+    } catch (error) {
+        console.error("There was a problem with the API request:", error);
+    }
+}
   // Run fetchAirports function when the script loads
   fetchAirports();
 </script>
