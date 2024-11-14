@@ -1,6 +1,7 @@
 
 
 <script>
+    import { active } from 'd3';
   import { onMount } from 'svelte';
 
   onMount(() => {
@@ -130,15 +131,66 @@
   function displayApiResponse() {
     const responseContainer = document.getElementById("responseContainer");
 
+    // Check if apiResponse is defined, log it for debugging
+    if (!apiResponse) {
+        console.error("apiResponse is undefined");
+        return;
+    }
+    console.log("apiResponse:", apiResponse);
+
+    // Safely access best hotels and activities with default values
+    let hotelsHtml = "";
+    if (Array.isArray(apiResponse.best_hotels)) {
+        hotelsHtml = apiResponse.best_hotels.map(hotel => {
+            const [name, price, url] = hotel; 
+            return `
+                <div class="hotel">
+                    <h4>${name}</h4>
+                    <p>Price: ${price}</p>
+                    <a href="${url}" target="_blank">Book Now</a>
+                </div>
+            `;
+        }).join("");
+    } else {
+        hotelsHtml = "<p>No hotels available</p>";
+    }
+
+    let activitiesHtml = ""
+    if (Array.isArray(apiResponse.activities)) {
+      activitiesHtml = apiResponse.activities.map(activ =>{
+        const [name, address, description] = activ;
+        return `
+                <div class="hotel">
+                    <h4>${name}</h4>
+                    <p>Price: ${address}</p>
+                    <a href="${description}" target="_blank">Book Now</a>
+                </div>
+            `;
+        }).join("");
+    } else {
+        activitiesHtml= "<p>No hotels available</p>";
+    }
+
+    // Set up the innerHTML with AI response check and default values
     responseContainer.innerHTML = `
         <h2>Your Travel Plan</h2>
+        
+        <div>
+            <h3>Best Hotels</h3>
+            ${hotelsHtml}
+        </div>
+        
+        <div>
+            <h3>Activities</h3>
+            ${activitiesHtml}
+        </div>
+
         <md-block>
             <strong>AI Response:</strong>
-            <div>${apiResponse?.openai_response}</div>
+            <div>${apiResponse.openai_response || "No response available"}</div>
         </md-block>
-        <p><strong>Total Flight Price:</strong> ${apiResponse?.total_flight_price || "N/A"}</p>
-        <p><strong>Best Hotels:</strong> ${apiResponse?.best_hotels?.join(", ") || "N/A"}</p>
-        <p><strong>Activities:</strong> ${apiResponse?.activities?.join(", ") || "N/A"}</p>
+        
+        <p><strong>Total Flight Price:</strong> ${apiResponse.total_flight_price || "N/A"}</p>
     `;
 
     // Re-initialize the md-block after setting innerHTML
@@ -150,6 +202,7 @@
     };
     document.head.appendChild(mdBlockScript);
 }
+
 
   // Run fetchAirports function when the script loads
   fetchAirports();
@@ -247,34 +300,11 @@
   </label>
 
   <label>
-    <button on:click="{generate}">Ask your personalized AI travel agent</button>
+    <button  on:click="{generate}" >Ask your personalized AI travel agent </button>
   </label>
 
   <!-- Container to display the API response -->
   <div id="responseContainer"></div>
 </main>
 
-<style>
-  /* Example styles, customize as needed */
-  label {
-      display: block;
-      margin-bottom: 1em;
-  }
 
-  input, select {
-      display: block;
-      margin-top: 0.5em;
-  }
-
-  input[type="text"] {
-      width: 100%;
-      padding: 8px;
-  }
-
-  #responseContainer {
-      margin-top: 20px;
-      padding: 10px;
-      border: 1px solid #ccc;
-      background-color: #f9f9f9;
-  }
-</style>

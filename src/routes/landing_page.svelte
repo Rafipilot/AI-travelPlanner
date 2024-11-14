@@ -16,6 +16,4 @@
 <main>
   <h1>CityTravel.AI</h1>
   <a href="/#/input_page" id="links">Get Started</a>
-  <!-- Use <md-block> here after loading the script -->
-  <md-block>## Header</md-block>
 </main>

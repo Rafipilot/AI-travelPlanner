@@ -45,9 +45,9 @@ def get_coords(city_name):
             # Get latitude and longitude
             lat = geocode_data['results'][0]['geometry']['location']['lat']
             lng = geocode_data['results'][0]['geometry']['location']['lng']
-
-    return lat, lng
-
+        return lat, lng
+    else:
+        print("Error with google api")
 def get_hotel_website(name):  
     url = 'https://www.google.com/search'
     headers = {

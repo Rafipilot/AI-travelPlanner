@@ -46,47 +46,10 @@ input, select {
   transition: border-color 0.3s ease-in-out;
 }
 
-/* Input Focus Effect */
-input:focus, select:focus {
-  outline: none;
-  border-color: #4a90e2;
-  box-shadow: 0 0 5px rgba(74, 144, 226, 0.3);
-}
 
-/* Range Slider */
-input[type="range"] {
-  width: 100%;
-  margin-top: 10px;
-  -webkit-appearance: none;
-  appearance: none;
-  height: 8px;
-  border-radius: 5px;
-  background: #ddd;
-  outline: none;
-  transition: background 0.3s ease;
-}
 
-input[type="range"]:focus {
-  background: #4a90e2;
-}
 
-input[type="range"]::-webkit-slider-thumb {
-  -webkit-appearance: none;
-  appearance: none;
-  width: 20px;
-  height: 20px;
-  border-radius: 50%;
-  background: #4a90e2;
-  cursor: pointer;
-}
 
-input[type="range"]::-moz-range-thumb {
-  width: 20px;
-  height: 20px;
-  border-radius: 50%;
-  background: #4a90e2;
-  cursor: pointer;
-}
 
 /* Budget Range Labels */
 span {
@@ -115,3 +78,19 @@ select {
     font-size: 1em;
   }
 }
+
+#links {
+  color: inherit;
+  text-decoration: none;
+  border: 1px solid black;
+  padding: 10px 20px;
+  display: inline-block;
+  font-family: sans-serif;
+
+}
+
+#links :hover {
+  transform: translateY(-3px);
+ }
+
+ 
