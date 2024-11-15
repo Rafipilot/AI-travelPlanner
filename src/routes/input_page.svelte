@@ -18,7 +18,7 @@
   let destination_airport = "";
   let departure_airport = "";
   let number_of_people = 0;
-  let budgetRange = [100, 20000];
+  let budget = 100;
   let departureDate = "";
   let returnDate = "";
   let airports = [];  // Array to store airport data
@@ -82,8 +82,8 @@
     }
 
     function handleBudgetChange(event) {
-        budgetRange = [event.target.value[0], event.target.value[1]];
-    }
+        budget = event.target.value;
+  }
 
     function handleDepartureDateChange(event) {
         departureDate = event.target.value;
@@ -139,11 +139,12 @@
 }
 
   async function generate(event) {
+    budget = Number(budget);
     const travelData = {
         departure_airport,
         destination_airport,
         number_of_people,
-        budget_range: 3000, // temp hard coding budget
+        budget_range: budget, // temp hard coding budget
         departure_date: departureDate,
         return_date: returnDate,
         city_destination: destination_city
@@ -314,15 +315,15 @@
 
   <!-- Budget Range Input -->
   <label>
-      Budget Range:
-      <input
-          type="range"
-          min="{budgetRange[0]}"
-          max="{budgetRange[1]}"
-          bind:value="{budgetRange}"
-          on:input="{handleBudgetChange}"
-      />
-      <span>Left: {budgetRange[0]}</span> - <span>Right: {budgetRange[1]}</span>
+    Budget:
+    <input
+      type="range"
+      min="100"
+      max="20000"
+      step="10"
+      on:input="{handleBudgetChange}"
+    />
+    <span>{budget}</span>
   </label>
 
   <!-- Departure Date Input -->
