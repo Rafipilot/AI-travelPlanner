@@ -21,7 +21,6 @@ ser_api_key = os.getenv("SER_API_KEY")
 openai_key = os.getenv("OPENAI_KEY")
 
 
-openai_key = os.getenv("openai_key")
 
 
 app = Flask(__name__)
