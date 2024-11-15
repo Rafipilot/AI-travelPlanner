@@ -9,3 +9,4 @@ streamlit==1.40.0
 google-search-results
 flask
 flask_cors
+gunicorn
