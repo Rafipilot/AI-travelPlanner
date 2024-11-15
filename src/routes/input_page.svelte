@@ -95,6 +95,16 @@
     destination_city = event.target.value;
   }
 
+  function showSection(sectionId) {
+    // Hide all sections initially
+    document.getElementById("hotelsSection").style.display = "none";
+    document.getElementById("activitiesSection").style.display = "none";
+    document.getElementById("aiResponseSection").style.display = "none";
+
+    // Show the selected section
+    document.getElementById(sectionId + "Section").style.display = "block";
+}
+
   async function generate(event) {
     const travelData = {
         departure_airport,
@@ -129,20 +139,14 @@
 
   // Display the API response data in the UI
   function displayApiResponse() {
-    const responseContainer = document.getElementById("responseContainer");
+    document.getElementById("mainPage").style.display = "none";
+    document.getElementById("responsePage").style.display = "block";
 
-    // Check if apiResponse is defined, log it for debugging
-    if (!apiResponse) {
-        console.error("apiResponse is undefined");
-        return;
-    }
-    console.log("apiResponse:", apiResponse);
-
-    // Safely access best hotels and activities with default values
+    // Populate hotels section
     let hotelsHtml = "";
     if (Array.isArray(apiResponse.best_hotels)) {
         hotelsHtml = apiResponse.best_hotels.map(hotel => {
-            const [name, price, url] = hotel; 
+            const [name, price, url] = hotel;
             return `
                 <div class="hotel">
                     <h4>${name}</h4>
@@ -154,61 +158,56 @@
     } else {
         hotelsHtml = "<p>No hotels available</p>";
     }
+    document.getElementById("hotelsContent").innerHTML = hotelsHtml;
 
-    let activitiesHtml = ""
+    // Populate activities section
+    let activitiesHtml = "";
     if (Array.isArray(apiResponse.activities)) {
-      activitiesHtml = apiResponse.activities.map(activ =>{
-        const [name, address, description] = activ;
-        return `
-                <div class="hotel">
+        activitiesHtml = apiResponse.activities.map(activ => {
+            const [name, address, description] = activ;
+            return `
+                <div class="activity">
                     <h4>${name}</h4>
-                    <p>Price: ${address}</p>
-                    <a href="${description}" target="_blank">Book Now</a>
+                    <p>Address: ${address}</p>
+                    <p>Description: ${description}</p>
                 </div>
             `;
         }).join("");
     } else {
-        activitiesHtml= "<p>No hotels available</p>";
+        activitiesHtml = "<p>No activities available</p>";
     }
+    document.getElementById("activitiesContent").innerHTML = activitiesHtml;
 
-    // Set up the innerHTML with AI response check and default values
-    responseContainer.innerHTML = `
-        <h2>Your Travel Plan</h2>
-        
-        <div>
-            <h3>Best Hotels</h3>
-            ${hotelsHtml}
-        </div>
-        
-        <div>
-            <h3>Activities</h3>
-            ${activitiesHtml}
-        </div>
-
+    // Populate AI response section using md-block for Markdown rendering
+    document.getElementById("aiResponseContent").innerHTML = `
         <md-block>
             <strong>AI Response:</strong>
-            <div>${apiResponse.openai_response || "No response available"}</div>
+            ${apiResponse.openai_response || "No response available"}
         </md-block>
-        
         <p><strong>Total Flight Price:</strong> ${apiResponse.total_flight_price || "N/A"}</p>
     `;
 
-    // Re-initialize the md-block after setting innerHTML
+    // Reinitialize md-block to render Markdown
     const mdBlockScript = document.createElement('script');
     mdBlockScript.src = 'https://md-block.verou.me/md-block.js';
     mdBlockScript.type = 'module';
     mdBlockScript.onload = () => {
-        console.log('md-block script reloaded and applied.');
+        console.log('md-block script reloaded and applied for Markdown rendering.');
     };
     document.head.appendChild(mdBlockScript);
 }
+
+
 
 
   // Run fetchAirports function when the script loads
   fetchAirports();
 </script>
 
+
+
 <main>
+    <div id = "mainPage">
   <h1>Travel Details</h1>
 
   <!-- Departure Airport Search Input -->
@@ -302,9 +301,37 @@
   <label>
     <button  on:click="{generate}" >Ask your personalized AI travel agent </button>
   </label>
-
+</div>
   <!-- Container to display the API response -->
-  <div id="responseContainer"></div>
+  <div id="responsePage" style="display: none;">
+    <!-- Display API Response here -->
+
+        <!-- Tab links -->
+        <div class="tab">
+            <button on:click="{() => showSection('hotels')}">Best Hotels</button>
+            <button on:click="{() => showSection('activities')}">Activities</button>
+            <button on:click="{() => showSection('aiResponse')}">AI Response</button>
+        </div>
+     
+        <!-- Tab content sections -->
+        <div id="hotelsSection" class="tabContent" style="display: none;">
+            <h3>Best Hotels</h3>
+            <div id="hotelsContent"></div> <!-- Dynamic content goes here -->
+        </div>
+     
+        <div id="activitiesSection" class="tabContent" style="display: none;">
+            <h3>Activities</h3>
+            <div id="activitiesContent"></div> <!-- Dynamic content goes here -->
+        </div>
+     
+        <div id="aiResponseSection" class="tabContent" style="display: none;">
+            <h3>AI Response</h3>
+            <div id="aiResponseContent"></div> <!-- Dynamic content goes here -->
+        </div>
+     
+        <!-- Back button to return to main input page -->
+     
+ </div>
 </main>
 
 
