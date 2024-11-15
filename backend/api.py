@@ -8,7 +8,21 @@ import requests
 import pandas as pd
 from serpapi import GoogleSearch
 import re 
-from config import openai_key, google_api_key, ser_api_key, am_auth, am_key
+
+from dotenv import load_dotenv
+import os
+
+load_dotenv()
+
+am_key = os.getenv("AM_KEY")
+am_auth = os.getenv("AM_AUTH")
+google_api_key = os.getenv("GOOGLE_API_KEY")
+ser_api_key = os.getenv("SER_API_KEY")
+openai_key = os.getenv("OPENAI_KEY")
+
+
+openai_key = os.getenv("openai_key")
+
 
 app = Flask(__name__)
 CORS(app)

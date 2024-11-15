@@ -28,73 +28,106 @@
   let apiResponse = null;  // Variable to store API response data
 
   // Fetch airport data from the provided URL
-  async function fetchAirports() {
-      const response = await fetch("https://raw.githubusercontent.com/jpatokal/openflights/master/data/airports.dat");
-      const data = await response.text();
-      const lines = data.split('\n');
-      airports = lines.map(line => {
-          const fields = line.split(',');
-          
-          // Check if the line has enough fields and ignore empty lines
-          if (fields.length < 13) return null;  // Skip malformed lines
-          
-          return {
-              name: fields[1]?.replace(/"/g, '') || '',  // Remove quotes
-              city: fields[2]?.replace(/"/g, '') || '',
-              country: fields[3]?.replace(/"/g, '') || '',
-              code: fields[4]?.replace(/"/g, '') || ''
-          };
-      }).filter(Boolean);  // Remove any null entries (malformed lines)
-  }
+    async function fetchAirports() {
+        const response = await fetch("https://raw.githubusercontent.com/jpatokal/openflights/master/data/airports.dat");
+        const data = await response.text();
+        const lines = data.split('\n');
+        airports = lines.map(line => {
+            const fields = line.split(',');
+            
+            // Check if the line has enough fields and ignore empty lines
+            if (fields.length < 13) return null;  // Skip malformed lines
+            
+            return {
+                name: fields[1]?.replace(/"/g, '') || '',  // Remove quotes
+                city: fields[2]?.replace(/"/g, '') || '',
+                country: fields[3]?.replace(/"/g, '') || '',
+                code: fields[4]?.replace(/"/g, '') || ''
+            };
+        }).filter(Boolean);  // Remove any null entries (malformed lines)
+    }
 
-  // Filter airports based on search term
-  function filteredAirports(searchTerm) {
-      return airports.filter(airport => {
-          const fullName = `${airport.name} (${airport.city}, ${airport.country})`.toLowerCase();
-          return fullName.includes(searchTerm.toLowerCase());
-      });
-  }
+    // Filter airports based on search term
+    function filteredAirports(searchTerm) {
+        return airports.filter(airport => {
+            const fullName = `${airport.name} (${airport.city}, ${airport.country})`.toLowerCase();
+            return fullName.includes(searchTerm.toLowerCase());
+        });
+    }
 
-  // Handle changes to the departure airport search term
-  function handleDepartureSearchChange(event) {
-      searchTermDeparture = event.target.value;
-  }
+    // Handle changes to the departure airport search term
+    function handleDepartureSearchChange(event) {
+        searchTermDeparture = event.target.value;
+    }
 
-  // Handle changes to the destination airport search term
-  function handleDestinationSearchChange(event) {
-      searchTermDestination = event.target.value;
-  }
+    // Handle changes to the destination airport search term
+    function handleDestinationSearchChange(event) {
+        searchTermDestination = event.target.value;
+    }
 
-  // Handle changes to the departure airport selection
-  function handleDepartureChange(event) {
-      departure_airport = event.target.value;
-  }
+    // Handle changes to the departure airport selection
+    function handleDepartureChange(event) {
+        departure_airport = event.target.value;
+        hide_departure_dropdown('departureDropdown'); // Hide the dropdown after selection
+    }
 
-  // Handle changes to the destination airport selection
-  function handleDestinationChange(event) {
-      destination_airport = event.target.value;
-  }
+    // Handle changes to the destination airport selection
+    function handleDestinationChange(event) {
+        destination_airport = event.target.value;
+        hide_destination_dropdown("destinationDropdown")
+    }
 
-  function handleNumberPeopleChange(event) {
-      number_of_people = event.target.value;
-  }
+    function handleNumberPeopleChange(event) {
+        number_of_people = event.target.value;
+    }
 
-  function handleBudgetChange(event) {
-      budgetRange = [event.target.value[0], event.target.value[1]];
-  }
+    function handleBudgetChange(event) {
+        budgetRange = [event.target.value[0], event.target.value[1]];
+    }
 
-  function handleDepartureDateChange(event) {
-      departureDate = event.target.value;
-  }
+    function handleDepartureDateChange(event) {
+        departureDate = event.target.value;
+    }
 
-  function handleReturnDateChange(event) {
-      returnDate = event.target.value;
-  }
+    function handleReturnDateChange(event) {
+        returnDate = event.target.value;
+    }
 
-  function handleCityDestinationChange(event) {
+    function handleCityDestinationChange(event) {
     destination_city = event.target.value;
-  }
+    }
 
+    function show_destination_dropdown(dropdownId) {
+        const dropdown = document.getElementById(dropdownId);
+        if (dropdown) {
+            console.log(`Showing dropdown for: ${dropdownId}`);
+            dropdown.style.display = "block";
+        } else {
+            console.log(`Dropdown not found for: ${dropdownId}`);
+        }
+}
+
+    function hide_destination_dropdown(dropdownId) {
+        const dropdown = document.getElementById(dropdownId);
+        if (dropdown){
+            dropdown.style.display = "none" // hide      
+        }
+    }
+
+
+  function show_departure_dropdown(dropdownId)  {
+    const dropdown = document.getElementById(dropdownId)
+    if (dropdown) {
+        dropdown.style.display = "block" // show
+    }
+}
+
+    function hide_departure_dropdown(dropdownId){
+        const dropdown = document.getElementById(dropdownId);
+        if (dropdown) {
+            dropdown.style.display = "none" // hide 
+        }
+    }
   function showSection(sectionId) {
     // Hide all sections initially
     document.getElementById("hotelsSection").style.display = "none";
@@ -136,6 +169,7 @@
         console.error("There was a problem with the API request:", error);
     }
   }
+
 
   // Display the API response data in the UI
   function displayApiResponse() {
@@ -212,36 +246,50 @@
 
   <!-- Departure Airport Search Input -->
   <label>
-      Departure Airport:
-      <input
-          type="text"
-          placeholder="Search for Departure Airport"
-          value="{searchTermDeparture}"
-          on:input="{handleDepartureSearchChange}"
-      />
-      <select on:change="{handleDepartureChange}" bind:value="{departure_airport}">
-          <option value="">Select Departure Airport</option>
-          {#each filteredAirports(searchTermDeparture) as airport}
-              <option value="{airport.code}">{airport.name} ({airport.city}, {airport.country})</option>
-          {/each}
-      </select>
-  </label>
+    Departure Airport:
+    <input
+        type="text"
+        placeholder="Search for Departure Airport"
+        value="{searchTermDeparture}"
+        on:input="{handleDepartureSearchChange}"
+        on:focus="{() => show_departure_dropdown('departureDropdown')}" 
+    />
+    <select
+        id="departureDropdown"
+        on:change="{handleDepartureChange}" 
+        bind:value="{departure_airport}"
+        size="{filteredAirports(searchTermDeparture).length || 1}" 
+        style="display: none;" 
+    >
+        <option value="">Select Departure Airport</option>
+        {#each filteredAirports(searchTermDeparture) as airport}
+            <option value="{airport.code}">{airport.name} ({airport.city}, {airport.country})</option>
+        {/each}
+    </select>
+</label>
 
   <!-- Destination Airport Search Input -->
   <label>
       Destination Airport:
       <input
-          type="text"
-          placeholder="Search for Destination Airport"
-          value="{searchTermDestination}"
-          on:input="{handleDestinationSearchChange}"
-      />
-      <select on:change="{handleDestinationChange}" bind:value="{destination_airport}">
-          <option value="">Select Destination Airport</option>
-          {#each filteredAirports(searchTermDestination) as airport}
-              <option value="{airport.code}">{airport.name} ({airport.city}, {airport.country})</option>
-          {/each}
-      </select>
+    type="text"
+    placeholder="Search for Destination Airport"
+    value="{searchTermDestination}"
+    on:input="{handleDestinationSearchChange}"
+    on:focus="{() => show_destination_dropdown('destinationDropdown')}"
+/>
+<select
+    id="destinationDropdown"
+    on:change="{handleDestinationChange}"
+    bind:value="{destination_airport}"
+    size="{filteredAirports(searchTermDestination).length || 1}"
+    style="display: none;"
+>
+    <option value="">Select Destination Airport</option>
+    {#each filteredAirports(searchTermDestination) as airport}
+        <option value="{airport.code}">{airport.name} ({airport.city}, {airport.country})</option>
+    {/each}
+</select>
   </label>
 
   <!-- Number of People Input -->
@@ -308,9 +356,9 @@
 
         <!-- Tab links -->
         <div class="tab">
-            <button on:click="{() => showSection('hotels')}">Best Hotels</button>
-            <button on:click="{() => showSection('activities')}">Activities</button>
-            <button on:click="{() => showSection('aiResponse')}">AI Response</button>
+            <button on:click="{() => showSection('hotels')}" id="tab_buttons">Best Hotels</button>
+            <button on:click="{() => showSection('activities')}" id="tab_buttons">Activities</button>
+            <button on:click="{() => showSection('aiResponse')}" id="tab_buttons">AI Response</button>
         </div>
      
         <!-- Tab content sections -->

@@ -1,0 +1,11 @@
+amadeus==11.0.0
+beautifulsoup4==4.12.3
+google_search_results==2.4.2
+openai==1.54.4
+pandas==2.2.3
+Requests==2.32.3
+serpapi==0.1.5
+streamlit==1.40.0
+google-search-results
+flask
+flask_cors

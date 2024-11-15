@@ -26,3 +26,5 @@ dist-ssr
 config.py
 
 __pycache__/
+
+.env
