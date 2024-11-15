@@ -10,3 +10,4 @@ google-search-results
 flask
 flask_cors
 gunicorn
+python-dotenv
