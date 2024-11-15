@@ -15,5 +15,5 @@
 
 <main>
   <h1>CityTravel.AI</h1>
-  <a href="/#/input_page" id="links">Get Started</a>
+  <a href="/#/input_page" id="start_button">Get Started</a>
 </main>

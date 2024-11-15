@@ -321,7 +321,7 @@ def get_openai_response(budget, depart_date, return_date, number_of_people, depa
 
     f"**Hotel Recommendation**\n"
     f"{best_hotels}"
-    f"- Price ({duration-1} nights):"
+    f"- Price (Per night):"
     f"- CLick here to book your stay at"
 
     f"**Activities and Attractions:**\n"

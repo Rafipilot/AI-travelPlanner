@@ -150,7 +150,7 @@
     };
 
     try {
-        const response = await fetch("http://127.0.0.1:5000/api/travel", {
+        const response = await fetch("https://my-svelte-project.onrender.com/api/travel", {
             method: "POST",
             headers: {
                 "Content-Type": "application/json"
@@ -184,7 +184,7 @@
             return `
                 <div class="hotel">
                     <h4>${name}</h4>
-                    <p>Price: ${price}</p>
+                    <p>Price: ${price}$ (Per night)</p>
                     <a href="${url}" target="_blank">Book Now</a>
                 </div>
             `;
@@ -218,7 +218,6 @@
             <strong>AI Response:</strong>
             ${apiResponse.openai_response || "No response available"}
         </md-block>
-        <p><strong>Total Flight Price:</strong> ${apiResponse.total_flight_price || "N/A"}</p>
     `;
 
     // Reinitialize md-block to render Markdown
@@ -347,7 +346,7 @@
   </label>
 
   <label>
-    <button  on:click="{generate}" >Ask your personalized AI travel agent </button>
+    <button  on:click="{generate}"  id = "start_button">Ask your personalized AI travel agent </button>
   </label>
 </div>
   <!-- Container to display the API response -->
@@ -355,7 +354,7 @@
     <!-- Display API Response here -->
 
         <!-- Tab links -->
-        <div class="tab">
+        <div id="tab">
             <button on:click="{() => showSection('hotels')}" id="tab_buttons">Best Hotels</button>
             <button on:click="{() => showSection('activities')}" id="tab_buttons">Activities</button>
             <button on:click="{() => showSection('aiResponse')}" id="tab_buttons">AI Response</button>
