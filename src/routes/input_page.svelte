@@ -18,7 +18,7 @@
   let destination_airport = "";
   let departure_airport = "";
   let number_of_people = 0;
-  let budget = 100;
+  let budget = 10000;
   let departureDate = "";
   let returnDate = "";
   let airports = [];  // Array to store airport data
@@ -344,10 +344,12 @@ async function generate(event) {
   <label>
       Return Date:
       <input
-          type="date"
-          on:input="{handleReturnDateChange}"
-          bind:value="{returnDate}"
-      />
+        type="date"
+        min = "{departureDate}"
+        on:input="{handleReturnDateChange}"
+        bind:value="{returnDate}"
+
+  />
   </label>
 
   <label>

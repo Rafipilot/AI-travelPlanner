@@ -7,6 +7,11 @@ body {
   padding: 0;
 }
 
+#sub-title {
+  text-align: center;
+  color: #4a90e2;
+}
+
 /* Main Container */
 main {
   max-width: 900px;
