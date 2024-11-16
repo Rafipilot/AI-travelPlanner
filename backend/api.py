@@ -8,7 +8,7 @@ import requests
 import pandas as pd
 from serpapi import GoogleSearch
 import re 
-
+import random 
 from dotenv import load_dotenv
 import os
 
@@ -387,6 +387,8 @@ def travel_agent():
     activities_to_return = []
     for i in range(duration):
         activities_to_return.append(activities[i])
+
+    activities_to_return = random.shuffle(activities_to_return)
 
     print(departure, destination, depart_date, number_of_people)
     flight, flight_price = get_flight_price(departure, destination, str(depart_date), int(number_of_people))

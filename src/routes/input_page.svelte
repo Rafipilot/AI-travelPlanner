@@ -26,6 +26,7 @@
   let searchTermDestination = "";  // Search term for destination airport
   let destination_city = "";
   let apiResponse = null;  // Variable to store API response data
+  let isLoading = false; 
 
   // Fetch airport data from the provided URL
     async function fetchAirports() {
@@ -138,38 +139,41 @@
     document.getElementById(sectionId + "Section").style.display = "block";
 }
 
-  async function generate(event) {
-    budget = Number(budget);
+
+async function generate(event) {
     const travelData = {
-        departure_airport,
-        destination_airport,
-        number_of_people,
-        budget_range: budget, // temp hard coding budget
-        departure_date: departureDate,
-        return_date: returnDate,
-        city_destination: destination_city
+      departure_airport,
+      destination_airport,
+      number_of_people,
+      budget_range: Number(budget),
+      departure_date: departureDate,
+      return_date: returnDate,
+      city_destination: destination_city
     };
 
+    isLoading = true; // Start showing the spinner
     try {
-        const response = await fetch("https://my-svelte-project.onrender.com/api/travel", {
-            method: "POST",
-            headers: {
-                "Content-Type": "application/json"
-            },
-            body: JSON.stringify(travelData)
-        });
+      const response = await fetch("https://my-svelte-project.onrender.com/api/travel", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(travelData)
+      });
 
-        if (!response.ok) {
-            throw new Error("Network response was not ok");
-        }
+      if (!response.ok) {
+        throw new Error("Network response was not ok");
+      }
 
-        const result = await response.json();
-        apiResponse = result.details;  // Store the result details
-        displayApiResponse();  // Update UI with the received data
+      const result = await response.json();
+      isLoading = false;
+      apiResponse = result.details;
+      displayApiResponse(); 
     } catch (error) {
-        console.error("There was a problem with the API request:", error);
+      console.error("API request error:", error);
+    } finally {
+      isLoading = false; // Stop showing the spinner
     }
   }
+
 
 
   // Display the API response data in the UI
@@ -347,9 +351,15 @@
   </label>
 
   <label>
-    <button  on:click="{generate}"  id = "start_button">Ask your personalized AI travel agent </button>
+    <button on:click="{generate}" id="start_button">Ask your personalized AI travel agent</button>
   </label>
 </div>
+
+{#if isLoading}
+  <!-- Spinner Container -->
+  <div class="spinner"></div>
+{/if}
+
   <!-- Container to display the API response -->
   <div id="responsePage" style="display: none;">
     <!-- Display API Response here -->
