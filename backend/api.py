@@ -345,14 +345,18 @@ def get_openai_response(budget, depart_date, return_date, number_of_people, depa
     f"Ensure that the plan is practical, engaging, and inspiring. The tone should be exciting and easy to follow, "
     f"with clear steps for the traveler to enjoy their journey."
 )
-    response = client.chat.completions.create(
-    model="gpt-3.5-turbo",
-    messages=[{"role": "system", "content": prompt}],
-    max_tokens=1200,
-    temperature=0.7,
-    )
-    travel_plan = response.choices[0].message.content
-    return travel_plan
+    try:
+        response = client.chat.completions.create(
+        model="gpt-3.5-turbo",
+        messages=[{"role": "system", "content": prompt}],
+        max_tokens=1200,
+        temperature=0.7,
+        )
+        travel_plan = response.choices[0].message.content
+        return travel_plan
+    except Exception as e:
+        print("Api error with openai : ", e)
+        return "Error with Openai Gpt-3"
 
 #route definitions
 @app.route('/api/travel', methods=['POST'])
