@@ -370,25 +370,30 @@ def travel_agent():
     return_date = data.get('return_date')
     city_destination = data.get("city_destination")
 
+
+
+    d1 = datetime.strptime(str(depart_date), "%Y-%m-%d")
+    d2 = datetime.strptime(str(return_date), "%Y-%m-%d")
+    duration = (d2 - d1).days
+
+
     print(depart_date, return_date)
+    lat, lng = get_coords(city_destination)
+    activities = get_activities(city_destination, lat, lng)
+    random.shuffle(activities)
+    activities_to_return = []
+    for i in range(duration):
+        activities_to_return.append(activities[i])
 
     Cost = int(0)
     non_stop = "true"# For call to amadeus
     non_stop2 = "Yes"# For call to GPT
     # Calculate duration and validate dates
-    d1 = datetime.strptime(str(depart_date), "%Y-%m-%d")
-    d2 = datetime.strptime(str(return_date), "%Y-%m-%d")
-    duration = (d2 - d1).days
+
     weather_info = get_average_temp(city_destination, depart_date)
 
-    lat, lng = get_coords(city_destination)
+    
     hotels = get_hotel_data(city_destination, lat, lng, str(depart_date), str(return_date))
-    activities = get_activities(city_destination, lat, lng)
-    activities_to_return = []
-    for i in range(duration):
-        activities_to_return.append(activities[i])
-
-    activities_to_return = random.shuffle(activities_to_return)
 
     print(departure, destination, depart_date, number_of_people)
     flight, flight_price = get_flight_price(departure, destination, str(depart_date), int(number_of_people))
