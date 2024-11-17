@@ -69,12 +69,14 @@
     // Handle changes to the departure airport selection
     function handleDepartureChange(event) {
         departure_airport = event.target.value;
+        searchTermDeparture = event.target.value;
         hide_departure_dropdown('departureDropdown'); // Hide the dropdown after selection
     }
 
     // Handle changes to the destination airport selection
     function handleDestinationChange(event) {
         destination_airport = event.target.value;
+        searchTermDestination = event.target.value
         hide_destination_dropdown("destinationDropdown")
     }
 
