@@ -362,8 +362,8 @@ def get_openai_response(budget, depart_date, return_date, number_of_people, depa
 @app.route('/api/travel', methods=['POST'])
 def travel_agent():
     data = request.get_json()
-    departure = data.get('departure_airport')
-    destination = data.get('destination_airport')
+    departure = data.get('searchTermDeparture')
+    destination = data.get('searchTermDestination')
     number_of_people = data.get('number_of_people')
     budget = data.get('budget_range')
     depart_date = data.get('departure_date')
