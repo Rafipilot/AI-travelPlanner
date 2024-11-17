@@ -299,7 +299,7 @@ def get_openai_response(budget, depart_date, return_date, number_of_people, depa
     f"personalized, and informative travel plan. The plan should be balanced, staying within the given "
     f"budget and trip duration. Please follow the guidelines for each section:\n\n"
 
-    f"Your AI generated Travel plan"
+    f"Travel plan for departure to destination city"
 
     f"**Trip Overview:**\n"
     f"- Budget: {budget}$\n"

@@ -252,6 +252,7 @@ async function generate(event) {
   <h1>Travel Details</h1>
 
   <!-- Departure Airport Search Input -->
+   <h4>Step 1: Select airports</h4>
   <label>
     Departure Airport:
     <input
@@ -300,6 +301,7 @@ async function generate(event) {
   </label>
 
   <!-- Number of People Input -->
+   <h4>Step 2: How many people are travelling</h4>
   <label>
       Number of People:
       <input
@@ -310,6 +312,7 @@ async function generate(event) {
       />
   </label>
 
+  <h4>Step 3: Which city are you going to</h4>
   <label>
     Destination city:
     <input
@@ -321,6 +324,7 @@ async function generate(event) {
   </label>
 
   <!-- Budget Range Input -->
+   <h4>Step 4: What is your budget</h4>
   <label>
     Budget:
     <input
@@ -330,10 +334,11 @@ async function generate(event) {
       step="10"
       on:input="{handleBudgetChange}"
     />
-    <span>{budget}</span>
+    <span>{budget}$</span>
   </label>
 
   <!-- Departure Date Input -->
+   <h4>Step 5: Select your travel dates</h4>
   <label>
       Departure Date:
       <input
