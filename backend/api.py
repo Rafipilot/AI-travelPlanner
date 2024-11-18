@@ -80,9 +80,10 @@ def get_hotel_website(name):
 def get_airline_name(code):
     try:
         code = airline_codes.get(code.upper(), "Unknown Airline Code")
+        return code
     except Exception as e:
-        print("Error in getting airline code : ", e)
-    return code
+        print("Error in getting airline name : ", e)
+        return "Error when getting airline name"
 
 def get_activities(city_name, lat ,lng):
 
@@ -175,44 +176,47 @@ def get_average_temp(location, depart_date):
 
 
 
-def get_flight_price(departure, destination, depart_date, number_of_people, non_stop="true"):
+def get_flight_price(departure_id, arrival_id, outbound_date, return_date=None, 
+                currency="USD", language="en", country="us", travel_type=1, 
+                adults=1, children=0):
+
+    params = {
+        "engine": "google_flights",
+        "departure_id": departure_id,
+        "arrival_id": arrival_id,
+        "outbound_date": outbound_date,
+        "return_date": return_date if travel_type == 1 else None,
+        "currency": currency,
+        "hl": language,
+        "gl": country,
+        "type": travel_type,
+        "adults": adults,
+        "children": children,
+        "api_key": ser_api_key
+    }
+
     try:
+        # Search for flights using the API
+        search = GoogleSearch(params)
+        results = search.get_dict()
 
-        # Make the API call with the provided data
-        response = amadeus.shopping.flight_offers_search.get(
-            originLocationCode=departure,
-            destinationLocationCode=destination,
-            departureDate=depart_date,
-            adults=number_of_people,
-            travelClass="ECONOMY",
-            nonStop=non_stop  # Direct flights only if True
-        )
-
-        if response.status_code == 200:   
-            # Check if we received any flight offers
-            if len(response.data) == 0:
-                print("No direct flights from the location selected!")
-                return None, None
-            
-            # Loop through the flight offers and extract relevant details
-            for offer in response.data:
-                carrier_code = offer["itineraries"][0]["segments"][0]["carrierCode"]
-                price = float(offer["price"]["total"])  # Convert price to float
-                print(f"Carrier Code: {carrier_code}, Price: {price}")
-                return carrier_code, price
-
+        # Extracting relevant details
+        flights = []
+        if "best_flights" in results:
+            for flight in results["best_flights"]:
+                price = flight.get("price", "N/A")
+                airlines = [leg["airline"] for leg in flight.get("flights", [])]
+                flights.append({"price": price, "airlines": airlines})
+        
+        if flights:
+            flight = flights[0]
+            return flight["airlines"][0], flight["price"]
         else:
-            # If status code is not 200, print error and response details
-            print("Error: Unable to retrieve flight data.")
-            print("Response Data:", response.result)
-            return None, None
+            return "No flights found", 0
+    except Exception as e:
+        print(f"Error fetching flights: {e}")
+        return "Error", 0
 
-    except ResponseError as error:
-        # Catch and print any API errors
-        print(f"API error in getting flight prices: {error}")
-        print(f"Error Description: {error.description}")
-        return None, None
-    
 
 def get_hotel_data(city_name, lat, lng, checkin, checkout, min_price=None, max_price=None, currency='USD', rating=None):
     try:
@@ -293,7 +297,7 @@ def get_hotel_data(city_name, lat, lng, checkin, checkout, min_price=None, max_p
         print("error occured", e)
         return []
 
-def get_openai_response(budget, depart_date, return_date, number_of_people, departure, destination, duration, airline_name, total_flight_price, non_stop2, weather_info, best_hotels, activities, Cost, city_destination):
+def get_openai_response(budget, depart_date, return_date, number_of_people, departure, destination, duration, airline_name, total_flight_price, weather_info, best_hotels, activities, Cost, city_destination):
     prompt = (
     f"You are an expert travel planner. Based on the details provided below, create a structured, "
     f"personalized, and informative travel plan. The plan should be balanced, staying within the given "
@@ -311,7 +315,6 @@ def get_openai_response(budget, depart_date, return_date, number_of_people, depa
     f"**Flight Information:**\n"
     f"- Airline: {airline_name}\n"
     f"- Price: ${total_flight_price} (Return tickets)\n"
-    f"- Non-stop: {non_stop2}"
     f"- Flight Details: Departure from {departure} and return from {destination}. Include flight duration and any relevant details.\n\n"
     f"- URL to bookling page of airline, try to find it if possible, if not then just leave it out"
 
@@ -386,8 +389,6 @@ def travel_agent():
         activities_to_return.append(activities[i])
 
     Cost = int(0)
-    non_stop = "true"# For call to amadeus
-    non_stop2 = "Yes"# For call to GPT
     # Calculate duration and validate dates
 
     weather_info = get_average_temp(city_destination, depart_date)
@@ -396,24 +397,11 @@ def travel_agent():
     hotels = get_hotel_data(city_destination, lat, lng, str(depart_date), str(return_date))
 
     print(departure, destination, depart_date, number_of_people)
-    flight, flight_price = get_flight_price(departure, destination, str(depart_date), int(number_of_people))
-    return_flight, return_flight_price = get_flight_price(destination, departure, str(return_date), int(number_of_people))
-    if flight is None or return_flight is None:
-        non_stop2 = "No"
-        flight, flight_price = get_flight_price(departure, destination, str(depart_date), int(number_of_people), non_stop="false")
-        return_flight, return_flight_price = get_flight_price(destination, departure, str(return_date), int(number_of_people), non_stop="false")
+    airline_name, flight_price = get_flight_price(departure, destination, str(depart_date), str(return_date), adults=number_of_people)
 
-    airline_name = get_airline_name(flight)
-    if flight_price is not None and return_flight_price is not None:
-        total_price_flight = flight_price + return_flight_price
-    else:
-        print("Error failed to retrieve full flight information")
-
-    Cost = Cost + total_price_flight
-
-    if budget and total_price_flight:
-        hotel_info = ""
-        per_night_budget = (int(budget - int(total_price_flight))) - 100 * duration
+    Cost = Cost + flight_price
+    hotel_info = ""
+    per_night_budget = (int(budget - int(flight_price))) - 100 * duration
     # Initialize variables
     
     best_hotels = []
@@ -435,7 +423,7 @@ def travel_agent():
         min_price_diffs = sorted(min_price_diffs, key=lambda x: x[1])[:4]
         best_hotels = [[hotel['name'], hotel['price'], hotel['url']] for hotel, diff in min_price_diffs]
 
-    openai_response = get_openai_response(budget, depart_date, return_date, number_of_people, departure, destination, duration, airline_name, total_price_flight, non_stop2, weather_info=weather_info, best_hotels=best_hotels, activities=activities, Cost=Cost, city_destination=city_destination)
+    openai_response = get_openai_response(budget, depart_date, return_date, number_of_people, departure, destination, duration, airline_name, flight_price, weather_info=weather_info, best_hotels=best_hotels, activities=activities, Cost=Cost, city_destination=city_destination)
 
     response = {
         "status": "success",
@@ -443,7 +431,7 @@ def travel_agent():
         "details": {
             "openai_response": openai_response,
             "airline_name": airline_name,
-            "total_flight_price": total_price_flight,
+            "total_flight_price": flight_price,
             "best_hotels": best_hotels,
             "activities": activities_to_return,
         }
