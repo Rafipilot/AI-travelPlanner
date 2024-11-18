@@ -156,7 +156,7 @@ async function generate(event) {
 
     isLoading = true; // Start showing the spinner
     try {
-      const response = await fetch("http://127.0.0.1:5000/api/travel", {
+      const response = await fetch("https://my-svelte-project.onrender.com/api/travel", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(travelData)
