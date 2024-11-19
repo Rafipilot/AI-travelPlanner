@@ -417,9 +417,9 @@ def travel_agent():
     hotels = get_hotel_data(destination, lat, lng, str(depart_date), str(return_date),number_people=number_of_people )
 
     print(departure, destination, depart_date, number_of_people)
-    departure = get_freebase_id(departure)
-    destination = get_freebase_id(destination)
-    airline_name, flight_price = get_flight_price(departure, destination, str(depart_date), str(return_date), adults=number_of_people)
+    departure_id = get_freebase_id(departure)
+    destination_id = get_freebase_id(destination)
+    airline_name, flight_price = get_flight_price(departure_id, destination_id, str(depart_date), str(return_date), adults=number_of_people)
 
     Cost = Cost + flight_price
     hotel_info = ""

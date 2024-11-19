@@ -69,8 +69,8 @@ def get_flight_price(departure_id, arrival_id, outbound_date, return_date=None,
 
 
 # Example usage
-london_id = get_freebase_id("London")
-paris_id = get_freebase_id("Paris")
+london_id = get_freebase_id("london")
+paris_id = get_freebase_id("paris")
 print(f"London Freebase ID: {london_id}")
 print(f"Paris Freebase ID: {paris_id}")
 outbound = "2024-11-25"
