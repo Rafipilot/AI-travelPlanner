@@ -47,6 +47,26 @@ amadeus = Client(
     client_secret=am_auth
 )
 
+def get_freebase_id(city_name):
+    # Fetch Freebase ID (P646) for a city from Wikidata using the city name
+    url = f"https://www.wikidata.org/w/api.php"
+    params = {
+        "action": "wbgetentities",
+        "titles": city_name,
+        "sites": "enwiki",
+        "format": "json"
+    }
+    response = requests.get(url, params=params)
+    data = response.json()
+    entities = data.get('entities', {})
+    
+    for entity in entities.values():
+        claims = entity.get('claims', {})
+        if 'P646' in claims:  # P646 is the Freebase ID property
+            return claims['P646'][0]['mainsnak']['datavalue']['value']
+    return None
+
+
 def get_coords(city_name):
     geocode_url = f'https://maps.googleapis.com/maps/api/geocode/json?address={city_name}&key={google_api_key}'
     geocode_response = requests.get(geocode_url)
@@ -366,15 +386,14 @@ def get_openai_response(budget, depart_date, return_date, number_of_people, depa
 @app.route('/api/travel', methods=['POST'])
 def travel_agent():
     data = request.get_json()
-    departure = data.get('searchTermDeparture')
-    destination = data.get('searchTermDestination')
+    departure = data.get('departure_city')
+    destination = data.get('destination_city')
     number_of_people = data.get('number_of_people')
     budget = data.get('budget_range')
     depart_date = data.get('departure_date')
     return_date = data.get('return_date')
-    city_destination = data.get("city_destination")
 
-
+    print(departure, destination)
 
     d1 = datetime.strptime(str(depart_date), "%Y-%m-%d")
     d2 = datetime.strptime(str(return_date), "%Y-%m-%d")
@@ -382,8 +401,8 @@ def travel_agent():
 
 
     print(depart_date, return_date)
-    lat, lng = get_coords(city_destination)
-    activities = get_activities(city_destination, lat, lng)
+    lat, lng = get_coords(destination)
+    activities = get_activities(destination, lat, lng)
     random.shuffle(activities)
     activities_to_return = []
     for i in range(duration):
@@ -392,12 +411,14 @@ def travel_agent():
     Cost = int(0)
     # Calculate duration and validate dates
 
-    weather_info = get_average_temp(city_destination, depart_date)
+    weather_info = get_average_temp(destination, depart_date)
 
     
-    hotels = get_hotel_data(city_destination, lat, lng, str(depart_date), str(return_date),number_people=number_of_people )
+    hotels = get_hotel_data(destination, lat, lng, str(depart_date), str(return_date),number_people=number_of_people )
 
     print(departure, destination, depart_date, number_of_people)
+    departure = get_freebase_id(departure)
+    destination = get_freebase_id(destination)
     airline_name, flight_price = get_flight_price(departure, destination, str(depart_date), str(return_date), adults=number_of_people)
 
     Cost = Cost + flight_price
@@ -424,7 +445,7 @@ def travel_agent():
         min_price_diffs = sorted(min_price_diffs, key=lambda x: x[1])[:4]
         best_hotels = [[hotel['name'], hotel['price'], hotel['url']] for hotel, diff in min_price_diffs]
 
-    openai_response = get_openai_response(budget, depart_date, return_date, number_of_people, departure, destination, duration, airline_name, flight_price, weather_info=weather_info, best_hotels=best_hotels, activities=activities, Cost=Cost, city_destination=city_destination)
+    openai_response = get_openai_response(budget, depart_date, return_date, number_of_people, departure, destination, duration, airline_name, flight_price, weather_info=weather_info, best_hotels=best_hotels, activities=activities, Cost=Cost, city_destination=destination)
 
     response = {
         "status": "success",

@@ -1,12 +1,33 @@
+import requests
 from serpapi import GoogleSearch
-import os
 from dotenv import load_dotenv
+import os
 
 load_dotenv()
+
 ser_api_key = os.getenv("SER_API_KEY")
 
-def get_flights(departure_id, arrival_id, outbound_date, return_date=None, 
-                currency="USD", language="en", country="us", travel_type=1, #travel type is round trip or not
+def get_freebase_id(city_name):
+    url = f"https://www.wikidata.org/w/api.php"
+    params = {
+        "action": "wbgetentities",
+        "titles": city_name,
+        "sites": "enwiki",
+        "format": "json"
+    }
+    response = requests.get(url, params=params)
+    data = response.json()
+    entities = data.get('entities', {})
+    
+    for entity in entities.values():
+        claims = entity.get('claims', {})
+        if 'P646' in claims:  # P646 is the Freebase ID property
+            return claims['P646'][0]['mainsnak']['datavalue']['value']
+    return None
+
+
+def get_flight_price(departure_id, arrival_id, outbound_date, return_date=None, 
+                currency="USD", language="en", country="us", travel_type=1, 
                 adults=1, children=0):
 
     params = {
@@ -24,29 +45,38 @@ def get_flights(departure_id, arrival_id, outbound_date, return_date=None,
         "api_key": ser_api_key
     }
 
-    search = GoogleSearch(params)
-    results = search.get_dict()
+    try:
+        # Search for flights using the API
+        search = GoogleSearch(params)
+        results = search.get_dict()
 
-    # Extracting relevant details
-    flights = []
-    if "best_flights" in results:
-        for flight in results["best_flights"]:
-            price = flight.get("price", "N/A")
-            airlines = [leg["airline"] for leg in flight["flights"]]
-            flights.append({"price": price, "airlines": airlines})
+        # Extracting relevant details
+        flights = []
+        if "best_flights" in results:
+            for flight in results["best_flights"]:
+                price = flight.get("price", "N/A")
+                airlines = [leg["airline"] for leg in flight.get("flights", [])]
+                flights.append({"price": price, "airlines": airlines})
+        
+        if flights:
+            flight = flights[0]
+            return flight["airlines"][0], flight["price"]
+        else:
+            return "No flights found", 0
+    except Exception as e:
+        print(f"Error fetching flights: {e}")
+        return "Error", 0
 
-    flight = flights[0]
-    return flight["airlines"][0], flight["price"]
 
 # Example usage
-if __name__ == "__main__":
-    departure = "LHR"  # London Heathrow
-    arrival = "ATH"    # Athens
-    outbound = "2024-11-19"
-    return_date = "2024-11-25"
+london_id = get_freebase_id("London")
+paris_id = get_freebase_id("Paris")
+print(f"London Freebase ID: {london_id}")
+print(f"Paris Freebase ID: {paris_id}")
+outbound = "2024-11-25"
+return_date = "2024-11-27"
+flight, price = get_flight_price(london_id, paris_id, outbound, return_date)
+print(flight, price)
 
-    # Replace 'your_serpapi_key' with your actual API key
 
-    
-    flight_name, flight_price= get_flights(departure, arrival, outbound, return_date)
-    print(flight_name, flight_price)
+
