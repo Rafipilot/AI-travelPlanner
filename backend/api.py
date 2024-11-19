@@ -218,7 +218,7 @@ def get_flight_price(departure_id, arrival_id, outbound_date, return_date=None,
         return "Error", 0
 
 
-def get_hotel_data(city_name, lat, lng, checkin, checkout, min_price=None, max_price=None, currency='USD', rating=None):
+def get_hotel_data(city_name, lat, lng, checkin, checkout, number_people = 2):
     try:
         # Define parameters for the request
         params = {
@@ -227,9 +227,7 @@ def get_hotel_data(city_name, lat, lng, checkin, checkout, min_price=None, max_p
             'check_in_date': checkin,
             'check_out_date': checkout,
             'api_key': ser_api_key,
-            'currency': currency,
-            'min_price': min_price,
-            'max_price': max_price,
+            'adults': number_people,
         }
         
         search = GoogleSearch(params)
@@ -397,7 +395,7 @@ def travel_agent():
     weather_info = get_average_temp(city_destination, depart_date)
 
     
-    hotels = get_hotel_data(city_destination, lat, lng, str(depart_date), str(return_date))
+    hotels = get_hotel_data(city_destination, lat, lng, str(depart_date), str(return_date),number_people=number_of_people )
 
     print(departure, destination, depart_date, number_of_people)
     airline_name, flight_price = get_flight_price(departure, destination, str(depart_date), str(return_date), adults=number_of_people)
