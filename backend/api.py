@@ -339,7 +339,10 @@ def get_openai_response(budget, depart_date, return_date, number_of_people, depa
     f"- Balance the itinerary to avoid overwhelming the traveler, but also ensure that the trip is fulfilling and diverse.\n\n"
 
     f"**Budget Breakdown:**\n"
-    f"- Cost: {Cost} This is including Hotel, Flights and estimate for meals\n\n"
+    f"- Flights: \n\n"
+    f"- Hotels: \n\n"
+    f"- Meals and activities(Estimated): \n\n"
+    f"- Total: \n\n"
 
     f"**Additional Tips:**\n"
     f"- Provide useful travel tips, such as advice on local customs, transportation options (e.g., metro, taxis), and "
