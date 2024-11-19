@@ -48,7 +48,8 @@ amadeus = Client(
 )
 
 def get_freebase_id(city_name):
-    # Fetch Freebase ID (P646) for a city from Wikidata using the city name
+
+    city_name = city_name.strip().title() #Make sure the city name first letter is capital
     url = f"https://www.wikidata.org/w/api.php"
     params = {
         "action": "wbgetentities",

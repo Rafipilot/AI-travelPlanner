@@ -8,6 +8,9 @@ load_dotenv()
 ser_api_key = os.getenv("SER_API_KEY")
 
 def get_freebase_id(city_name):
+    # Ensure the city name is properly capitalized (first letter uppercase)
+    city_name = city_name.strip().title()
+    
     url = f"https://www.wikidata.org/w/api.php"
     params = {
         "action": "wbgetentities",
@@ -24,6 +27,7 @@ def get_freebase_id(city_name):
         if 'P646' in claims:  # P646 is the Freebase ID property
             return claims['P646'][0]['mainsnak']['datavalue']['value']
     return None
+
 
 
 def get_flight_price(departure_id, arrival_id, outbound_date, return_date=None, 
