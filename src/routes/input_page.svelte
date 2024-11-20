@@ -72,7 +72,7 @@
 
       isLoading = true; // Start showing the spinner
       try {
-        const response = await fetch("https://my-svelte-project.onrender.com/api/travel", {
+        const response = await fetch("http://127.0.0.1:5000/api/travel", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify(travelData)
@@ -140,10 +140,12 @@
         flightsHtml = apiResponse.flights.map(flight => {
           const airlines = flight.airlines.join(", ");
           const price = flight.price;
+          const url = flight.url;
           return `
             <div class="flight">
               <h4>${airlines}</h4>
               <p>Price: ${price}$</p>
+              <a href="${url}">Click here</a>
             </div>
           `;
         }).join("");

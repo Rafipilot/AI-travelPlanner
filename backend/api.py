@@ -82,7 +82,8 @@ def get_coords(city_name):
         return lat, lng
     else:
         print("Error with google api")
-def get_hotel_website(name):  
+
+def get_website(name):  
     url = 'https://www.google.com/search'
     headers = {
         'Accept' : '*/*',
@@ -219,7 +220,8 @@ def get_flight_price(departure_id, arrival_id, outbound_date, return_date=None,
             for flight in results["best_flights"]:
                 price = flight.get("price", "N/A")
                 airlines = [leg["airline"] for leg in flight.get("flights", [])]
-                flights.append({"price": price, "airlines": airlines})
+                url = get_website(airlines)
+                flights.append({"price": price, "airlines": airlines, "url":url})
         
         if flights:
             return flights
@@ -299,7 +301,7 @@ def get_hotel_data(city_name, lat, lng, checkin, checkout, number_people = 2):
         for hotel in search_hotels.data:
             hotel_name = hotel['hotel']['name']
             price = hotel['offers'][0]['price']['total']
-            url = get_hotel_website(hotel_name)
+            url = get_website(hotel_name)
             hotel_offers.append({'name': hotel_name, 'price': price, "url": url})
         
         return hotel_offers
@@ -353,9 +355,9 @@ def get_openai_response(budget, depart_date, return_date, number_of_people, depa
 
     f"**Budget Breakdown:**\n"
     f"- Flights (depends on airline chosen): {flight_price}\n\n"
-    f"- Hotels: \n\n"
-    f"- Meals and activities(Estimated): \n\n"
-    f"- Total: \n\n"
+    f"- Hotels: (average the hotel options)\n\n"
+    f"- Meals and activities(Estimated): Estimate activities and food price here\n\n"
+    f"- Total: (add the whole budget together)\n\n"
 
     f"**Additional Tips:**\n"
     f"- Provide useful travel tips, such as advice on local customs, transportation options (e.g., metro, taxis), and "
@@ -460,6 +462,85 @@ def travel_agent():
         }
     }
     return jsonify(response)
+
+
+@app.route('/api/first_step', methods=['POST'])
+def flights_and_hotels():
+    data = request.get_json()
+    departure = data.get('departure_city')
+    destination = data.get('destination_city')
+    number_of_people = data.get('number_of_people')
+    budget = data.get('budget_range')
+    depart_date = data.get('departure_date')
+    return_date = data.get('return_date')
+    
+    d1 = datetime.strptime(str(depart_date), "%Y-%m-%d")
+    d2 = datetime.strptime(str(return_date), "%Y-%m-%d")
+    duration = (d2 - d1).days
+
+
+    print(depart_date, return_date)
+    lat, lng = get_coords(destination)
+
+    Cost = int(0)
+    
+    hotels = get_hotel_data(destination, lat, lng, str(depart_date), str(return_date),number_people=number_of_people )
+
+    print(departure, destination, depart_date, number_of_people)
+    departure_id = get_freebase_id(departure)
+    destination_id = get_freebase_id(destination)
+    print(departure_id, destination_id, depart_date, return_date, number_of_people)
+    flights = get_flight_price(departure_id, destination_id, str(depart_date), str(return_date), adults=number_of_people)
+    print(flights)
+    flights_prices = []
+    for flight in flights:
+        flights_prices.append(flight["price"])
+    average_price = sum(flights_prices)/len(flights_prices)
+    print(average_price)
+
+    Cost = Cost + average_price
+    hotel_info = ""
+    per_night_budget = (int(budget - int(average_price))) - 100 * duration
+    # Initialize variables
+    
+    best_hotels = []
+    min_price_diffs = []
+
+    # Find the four hotels with prices closest to the budget
+    for hotel in hotels:
+        hotel_info += f"- **{hotel['name']}**\n"
+        hotel_info += f"  - Price: {hotel['price'] * (duration - 1)}\n"
+        hotel_info += f"  - [Click here to book]({hotel['url']})\n"
+
+        price = int(float(hotel['price']))
+        price_diff = abs(per_night_budget - price)
+        
+        # Add each hotel to the list with its price difference
+        min_price_diffs.append((hotel, price_diff))
+
+        # Sort by price difference and select the top 4
+        min_price_diffs = sorted(min_price_diffs, key=lambda x: x[1])[:4]
+        best_hotels = [[hotel['name'], hotel['price'], hotel['url']] for hotel, diff in min_price_diffs]
+
+        response = {
+        "status": "success",
+        "message": "Travel details received",
+        "details": {
+            "flights": flights,
+            "best_hotels": best_hotels,
+        }
+    }
+    return jsonify(response)
+
+@app.route('/api/first_step', methods=['POST'])
+def response():
+    data = request.get_json()
+    hotel_name = data.get('departure_city')
+    hotel_price = data.get('destination_city')
+    airline_name = data.get('budget_range')
+    flight_price = data.get('departure_date')
+    flight_url = data.get('return_date')
+
 
 if __name__ == '__main__':
     app.run(debug=True)
