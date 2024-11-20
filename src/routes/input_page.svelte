@@ -64,7 +64,11 @@
         departure_date: departureDate,
         return_date: returnDate
       };
-  
+      if (!departure_city || !destination_city) {
+    alert("Please fill in both the departure city and the destination city.");
+    return; // Stop execution if inputs are invalid
+  }
+
       isLoading = true; // Start showing the spinner
       try {
         const response = await fetch("https://my-svelte-project.onrender.com/api/travel", {
@@ -253,7 +257,7 @@
       </div>
   
       <div id="aiResponseSection" class="tabContent" style="display: none;">
-        <h3>AI Response</h3>
+        <h3>AI Overview</h3>
         <div id="aiResponseContent"></div>
       </div>
     </div>
