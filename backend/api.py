@@ -308,7 +308,7 @@ def get_hotel_data(city_name, lat, lng, checkin, checkout, number_people = 2):
         print("error occured", e)
         return []
 
-def get_openai_response(budget, depart_date, return_date, number_of_people, departure, destination, duration, flights, weather_info, best_hotels, activities, Cost, city_destination):
+def get_openai_response(budget, depart_date, return_date, number_of_people, departure, destination, duration, flights,flight_price, weather_info, best_hotels, activities, Cost, city_destination):
     print(flights)
     prompt = (
     f"You are an expert travel planner. Based on the details provided below, create a structured, "
@@ -352,7 +352,7 @@ def get_openai_response(budget, depart_date, return_date, number_of_people, depa
     f"- Balance the itinerary to avoid overwhelming the traveler, but also ensure that the trip is fulfilling and diverse.\n\n"
 
     f"**Budget Breakdown:**\n"
-    f"- Flights: \n\n"
+    f"- Flights (depends on airline chosen): {flight_price}\n\n"
     f"- Hotels: \n\n"
     f"- Meals and activities(Estimated): \n\n"
     f"- Total: \n\n"
@@ -421,6 +421,7 @@ def travel_agent():
     for flight in flights:
         flights_prices.append(flight["price"])
     average_price = sum(flights_prices)/len(flights_prices)
+    print(average_price)
 
     Cost = Cost + average_price
     hotel_info = ""
@@ -446,7 +447,7 @@ def travel_agent():
         min_price_diffs = sorted(min_price_diffs, key=lambda x: x[1])[:4]
         best_hotels = [[hotel['name'], hotel['price'], hotel['url']] for hotel, diff in min_price_diffs]
 
-    openai_response = get_openai_response(budget, depart_date, return_date, number_of_people, departure, destination, duration, flights=flights, weather_info=weather_info, best_hotels=best_hotels, activities=activities, Cost=Cost, city_destination=destination)
+    openai_response = get_openai_response(budget, depart_date, return_date, number_of_people, departure, destination, duration, flights=flights, flight_price=average_price, weather_info=weather_info, best_hotels=best_hotels, activities=activities, Cost=Cost, city_destination=destination)
 
     response = {
         "status": "success",
