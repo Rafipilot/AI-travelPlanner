@@ -49,6 +49,7 @@
       document.getElementById("hotelsSection").style.display = "none";
       document.getElementById("activitiesSection").style.display = "none";
       document.getElementById("aiResponseSection").style.display = "none";
+      document.getElementById("flightinfoSection").style.display = "none";
   
       // Show the selected section
       document.getElementById(sectionId + "Section").style.display = "block";
@@ -71,7 +72,7 @@
 
       isLoading = true; // Start showing the spinner
       try {
-        const response = await fetch("https://my-svelte-project.onrender.com/api/travel", {
+        const response = await fetch("http://127.0.0.1:5000/api/travel", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify(travelData)
@@ -84,6 +85,7 @@
         const result = await response.json();
         isLoading = false;
         apiResponse = result.details;
+        console.log(apiResponse.openai_response)
         displayApiResponse();
       } catch (error) {
         console.error("API request error:", error);
@@ -132,6 +134,23 @@
         activitiesHtml = "<p>No activities available</p>";
       }
       document.getElementById("activitiesContent").innerHTML = activitiesHtml;
+
+      let flightsHtml = "";
+      if (Array.isArray(apiResponse.flights)) {
+        flightsHtml = apiResponse.flights.map(flight => {
+          const airlines = flight.airlines.join(", ");
+          const price = flight.price;
+          return `
+            <div class="flight">
+              <h4>${airlines}</h4>
+              <p>Price: ${price}$</p>
+            </div>
+          `;
+        }).join("");
+      } else {
+        flightsHtml = "<p>No flights available</p>";
+      }
+      document.getElementById("flightinfoContent").innerHTML = flightsHtml;
   
       // Populate AI response section using md-block for Markdown rendering
       document.getElementById("aiResponseContent").innerHTML = `
@@ -140,6 +159,8 @@
           ${apiResponse.openai_response || "No response available"}
         </md-block>
       `;
+
+
   
       // Reinitialize md-block to render Markdown
       const mdBlockScript = document.createElement('script');
@@ -243,6 +264,7 @@
       <div id="tab">
         <button on:click="{() => showSection('hotels')}" id="tab_buttons">Best Hotels</button>
         <button on:click="{() => showSection('activities')}" id="tab_buttons">Activities</button>
+        <button on:click="{() => showSection('flightinfo')}" id="tab_buttons">Flight Info</button>
         <button on:click="{() => showSection('aiResponse')}" id="tab_buttons">AI Response</button>
       </div>
   
@@ -259,6 +281,10 @@
       <div id="aiResponseSection" class="tabContent" style="display: none;">
         <h3>AI Overview</h3>
         <div id="aiResponseContent"></div>
+      </div>
+      <div id="flightinfoSection" class="tabContent" style="display: none;">
+          <h3>Flight Information</h3>
+          <div id="flightinfoContent"></div>
       </div>
     </div>
   </main>

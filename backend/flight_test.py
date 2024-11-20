@@ -63,8 +63,8 @@ def get_flight_price(departure_id, arrival_id, outbound_date, return_date=None,
                 flights.append({"price": price, "airlines": airlines})
         
         if flights:
-            flight = flights[0]
-            return flight["airlines"][0], flight["price"]
+            return flights
+
         else:
             return "No flights found", 0
     except Exception as e:
@@ -74,13 +74,15 @@ def get_flight_price(departure_id, arrival_id, outbound_date, return_date=None,
 
 # Example usage
 london_id = get_freebase_id("london")
-paris_id = get_freebase_id("paris")
+paris_id = get_freebase_id("athens")
 print(f"London Freebase ID: {london_id}")
 print(f"Paris Freebase ID: {paris_id}")
 outbound = "2024-11-25"
 return_date = "2024-11-27"
-flight, price = get_flight_price(london_id, paris_id, outbound, return_date)
-print(flight, price)
+flights = get_flight_price(london_id, paris_id, outbound, return_date)
+print(flights)
 
-
+for flight in flights:
+    print("Name: ", flight["airlines"][0])
+    print("price: ", flight["price"])
 

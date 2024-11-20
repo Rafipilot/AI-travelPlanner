@@ -98,14 +98,6 @@ def get_hotel_website(name):
     return first_link['href']
 
 
-def get_airline_name(code):
-    try:
-        code = airline_codes.get(code.upper(), "Unknown Airline Code")
-        return code
-    except Exception as e:
-        print("Error in getting airline name : ", e)
-        return "Error when getting airline name"
-
 def get_activities(city_name, lat ,lng):
 
 
@@ -230,8 +222,8 @@ def get_flight_price(departure_id, arrival_id, outbound_date, return_date=None,
                 flights.append({"price": price, "airlines": airlines})
         
         if flights:
-            flight = flights[0]
-            return flight["airlines"][0], flight["price"]
+            return flights
+
         else:
             return "No flights found", 0
     except Exception as e:
@@ -316,7 +308,8 @@ def get_hotel_data(city_name, lat, lng, checkin, checkout, number_people = 2):
         print("error occured", e)
         return []
 
-def get_openai_response(budget, depart_date, return_date, number_of_people, departure, destination, duration, airline_name, total_flight_price, weather_info, best_hotels, activities, Cost, city_destination):
+def get_openai_response(budget, depart_date, return_date, number_of_people, departure, destination, duration, flights, weather_info, best_hotels, activities, Cost, city_destination):
+    print(flights)
     prompt = (
     f"You are an expert travel planner. Based on the details provided below, create a structured, "
     f"personalized, and informative travel plan. The plan should be balanced, staying within the given "
@@ -332,8 +325,9 @@ def get_openai_response(budget, depart_date, return_date, number_of_people, depa
     f"- Destination Location: {destination}\n\n"
 
     f"**Flight Information:**\n"
-    f"- Airline: {airline_name}\n"
-    f"- Price: ${total_flight_price} (Return tickets)\n"
+    f"Info: {flights}  List Every single flight options in this format"
+    f"- Airline: \n"
+    f"- Price: $ (Return tickets)\n"
     f"- Flight Details: Departure from {departure} and return from {destination}. Include flight duration and any relevant details.\n\n"
     f"- URL to bookling page of airline, try to find it if possible, if not then just leave it out"
 
@@ -420,11 +414,17 @@ def travel_agent():
     print(departure, destination, depart_date, number_of_people)
     departure_id = get_freebase_id(departure)
     destination_id = get_freebase_id(destination)
-    airline_name, flight_price = get_flight_price(departure_id, destination_id, str(depart_date), str(return_date), adults=number_of_people)
+    
+    flights = get_flight_price(departure_id, destination_id, str(depart_date), str(return_date), adults=number_of_people)
+    print(flights)
+    flights_prices = []
+    for flight in flights:
+        flights_prices.append(flight["price"])
+    average_price = sum(flights_prices)/len(flights_prices)
 
-    Cost = Cost + flight_price
+    Cost = Cost + average_price
     hotel_info = ""
-    per_night_budget = (int(budget - int(flight_price))) - 100 * duration
+    per_night_budget = (int(budget - int(average_price))) - 100 * duration
     # Initialize variables
     
     best_hotels = []
@@ -446,15 +446,14 @@ def travel_agent():
         min_price_diffs = sorted(min_price_diffs, key=lambda x: x[1])[:4]
         best_hotels = [[hotel['name'], hotel['price'], hotel['url']] for hotel, diff in min_price_diffs]
 
-    openai_response = get_openai_response(budget, depart_date, return_date, number_of_people, departure, destination, duration, airline_name, flight_price, weather_info=weather_info, best_hotels=best_hotels, activities=activities, Cost=Cost, city_destination=destination)
+    openai_response = get_openai_response(budget, depart_date, return_date, number_of_people, departure, destination, duration, flights=flights, weather_info=weather_info, best_hotels=best_hotels, activities=activities, Cost=Cost, city_destination=destination)
 
     response = {
         "status": "success",
         "message": "Travel details received",
         "details": {
             "openai_response": openai_response,
-            "airline_name": airline_name,
-            "total_flight_price": flight_price,
+            "flights": flights,
             "best_hotels": best_hotels,
             "activities": activities_to_return,
         }
