@@ -24,7 +24,7 @@ openai_key = os.getenv("OPENAI_KEY")
 
 
 app = Flask(__name__)
-CORS(app)
+CORS(app, supports_credentials=True)
 
 client = OpenAI(api_key=openai_key)
 # Load the CSV file directly from the URL For getting airline name from code
