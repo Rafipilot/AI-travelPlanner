@@ -270,7 +270,7 @@ def get_hotel_data(city_name, lat, lng, checkin, checkout, number_people = 2):
                 
                 hotel_data = {
                     'name': property.get('name'),
-                    'price': price if price is not None else 'Price not available',
+                    'price': price if price is not None else 0,
                     'url': property.get('link', 'No URL available')
                 }
                 hotels.append(hotel_data)
