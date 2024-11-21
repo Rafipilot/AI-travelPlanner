@@ -11,6 +11,14 @@ def get_freebase_id(city_name):
     # Ensure the city name is properly capitalized (first letter uppercase)
     city_name = city_name.strip().title()
     
+    city_aliases = {
+    "New York": "New York City",
+    "Washington": "Washington, D.C."
+}
+
+    if city_name in city_aliases:
+        city_name = city_aliases[city_name]
+
     url = f"https://www.wikidata.org/w/api.php"
     params = {
         "action": "wbgetentities",
@@ -74,9 +82,9 @@ def get_flight_price(departure_id, arrival_id, outbound_date, return_date=None,
 
 # Example usage
 london_id = get_freebase_id("london")
-paris_id = get_freebase_id("athens")
+paris_id = get_freebase_id("New York")
 print(f"London Freebase ID: {london_id}")
-print(f"Paris Freebase ID: {paris_id}")
+print(f"New York Freebase ID: {paris_id}")
 outbound = "2024-11-25"
 return_date = "2024-11-27"
 flights = get_flight_price(london_id, paris_id, outbound, return_date)

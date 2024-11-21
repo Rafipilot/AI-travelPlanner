@@ -48,8 +48,14 @@ amadeus = Client(
 )
 
 def get_freebase_id(city_name):
-
-    city_name = city_name.strip().title() #Make sure the city name first letter is capital
+    # Ensure the city name is properly capitalized (first letter uppercase)
+    city_name = city_name.strip().title()
+    city_aliases = {
+    "New York": "New York City",
+    "Washington": "Washington, D.C."
+}
+    if city_name in city_aliases:
+        city_name = city_aliases[city_name]
     url = f"https://www.wikidata.org/w/api.php"
     params = {
         "action": "wbgetentities",
@@ -59,8 +65,7 @@ def get_freebase_id(city_name):
     }
     response = requests.get(url, params=params)
     data = response.json()
-    entities = data.get('entities', {})
-    
+    entities = data.get('entities', {})  
     for entity in entities.values():
         claims = entity.get('claims', {})
         if 'P646' in claims:  # P646 is the Freebase ID property
