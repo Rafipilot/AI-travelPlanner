@@ -233,7 +233,7 @@ def get_flight_price(departure_id, arrival_id, outbound_date, return_date=None,
         return "Error", 0
 
 
-def get_hotel_data(city_name, lat, lng, checkin, checkout, number_people = 2):
+def get_hotel_data(city_name, lat, lng, checkin, checkout, number_people):
     try:
         # Define parameters for the request
         params = {

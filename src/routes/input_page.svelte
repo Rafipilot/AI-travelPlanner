@@ -26,6 +26,7 @@
   let availableHotels = [];
   let showGenerateButton = false;
   let showAIResponse = false;
+  let aiResponsePage = false; // New flag for navigating to the AI response page
 
   function handleDepartureCityChange(event) {
     departure_city = event.target.value;
@@ -52,37 +53,40 @@
   }
 
   async function GPT_response() {
-  console.log("2ND CALL");
-  const data = {
-    selectedFlight,
-    selectedHotel,
-    departure_city,
-    destination_city,
-    number_of_people,
-    departure_date: departureDate,
-    return_date: returnDate,
-  };
-  try {
-    const response = await fetch("https://my-svelte-project.onrender.com/api/second_step", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(data),
-    });
+    console.log("2ND CALL");
 
-    if (!response.ok) {
-      throw new Error("Network response was not ok");
+    const data = {
+      selectedFlight,
+      selectedHotel,
+      departure_city,
+      destination_city,
+      number_of_people,
+      departure_date: departureDate,
+      return_date: returnDate,
+    };
+
+    isLoading = true;
+    try {
+      const response = await fetch("https://my-svelte-project.onrender.com/api/second_step", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(data),
+      });
+
+      if (!response.ok) {
+        throw new Error("Network response was not ok");
+      }
+
+      const result = await response.json();
+      apiResponse = result.details; // Assign the details to the apiResponse
+      aiResponsePage = true; // Switch to the AI response page
+      console.log(apiResponse);
+    } catch (error) {
+      console.error("API request error:", error);
+    } finally {
+      isLoading = false;
     }
-
-    const result = await response.json();
-    apiResponse = result.details; // Assign the details to the apiResponse
-    showAIResponse = true 
-    console.log(apiResponse);
-  } catch (error) {
-    console.error("API request error:", error);
-  } finally {
-    isLoading = false;
   }
-}
 
   async function generate() {
     console.log("Departure City: ", departure_city, "Destination City: ", destination_city);
@@ -140,7 +144,7 @@
 </script>
 
 <main>
-  {#if !apiResponse}
+  {#if !apiResponse && !aiResponsePage}
     <div id="mainPage">
       <h1>Travel Details</h1>
       <h4>Step 1: Select Departure City</h4>
@@ -168,7 +172,7 @@
     <div class="spinner"></div>
   {/if}
 
-  {#if apiResponse}
+  {#if apiResponse && !aiResponsePage}
     <div id="responsePage">
       <h2>Your Travel Details</h2>
 
@@ -189,27 +193,24 @@
         <select id="hotelSelect" on:change="{handleHotelSelection}">
           <option value="">-- Select a Hotel --</option>
           {#each availableHotels as hotel, index}
-            <option value="{index}">{hotel[0]} - {hotel[1]}$</option>
+            <option value="{index}">{hotel[0]} - {hotel[1]}$ per night</option>
           {/each}
         </select>
       </div>
 
-    <!-- AI Response Section -->
-    {#if showAIResponse}
-      <div id="aiResponseSection">
-        <h3>AI's Personalized Recommendation:</h3>
-        <!-- Wrap the markdown content inside a div that md-block will parse -->
-        <md-block>
-          <strong>AI Response:</strong>
-          ${apiResponse.response}
-        </md-block>
-      </div>
-    {/if}
-
-      <!-- Generate Button -->
       {#if showGenerateButton}
         <button on:click="{GPT_response}">Generate</button>
       {/if}
+    </div>
+  {/if}
+
+  {#if aiResponsePage}
+    <div id="aiResponsePage">
+      <h2>AI's Personalized Recommendation:</h2>
+      <md-block>
+        <strong>AI Response:</strong>
+        ${apiResponse.response}
+      </md-block>
     </div>
   {/if}
 </main>
