@@ -352,7 +352,7 @@ def get_openai_response(number_of_people, departure, destination, duration,fligh
     f"- Balance the itinerary to avoid overwhelming the traveler, but also ensure that the trip is fulfilling and diverse.\n\n"
 
     f"**Budget Breakdown:**\n"
-    f"- Flights (depends on airline chosen): {flights["price"]}\n\n"
+    f"- Flights (depends on airline chosen): {flights['price']}\n\n"
     f"- Hotels: (average the hotel options)\n\n"
     f"- Meals and activities(Estimated): Estimate activities and food price here\n\n"
     f"- Total: (add the whole budget together)\n\n"
