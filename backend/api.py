@@ -310,8 +310,7 @@ def get_hotel_data(city_name, lat, lng, checkin, checkout, number_people = 2):
         print("error occured", e)
         return []
 
-def get_openai_response(budget, depart_date, return_date, number_of_people, departure, destination, duration, flights,flight_price, weather_info, best_hotels, activities, Cost, city_destination):
-    print(flights)
+def get_openai_response(number_of_people, departure, destination, duration,flights, weather_info, best_hotels, activities):
     prompt = (
     f"You are an expert travel planner. Based on the details provided below, create a structured, "
     f"personalized, and informative travel plan. The plan should be balanced, staying within the given "
@@ -320,14 +319,13 @@ def get_openai_response(budget, depart_date, return_date, number_of_people, depa
     f"Travel plan for departure to destination city"
 
     f"**Trip Overview:**\n"
-    f"- Budget: {budget}$\n"
     f"- Trip Duration: {duration} days\n"
     f"- Number of Travelers: {number_of_people}\n"
     f"- Departure Location: {departure}\n"
     f"- Destination Location: {destination}\n\n"
 
     f"**Flight Information:**\n"
-    f"Info: {flights}  List Every single flight options in this format"
+    f"Info: {flights} "
     f"- Airline: \n"
     f"- Price: $ (Return tickets)\n"
     f"- Flight Details: Departure from {departure} and return from {destination}. Include flight duration and any relevant details.\n\n"
@@ -354,14 +352,14 @@ def get_openai_response(budget, depart_date, return_date, number_of_people, depa
     f"- Balance the itinerary to avoid overwhelming the traveler, but also ensure that the trip is fulfilling and diverse.\n\n"
 
     f"**Budget Breakdown:**\n"
-    f"- Flights (depends on airline chosen): {flight_price}\n\n"
+    f"- Flights (depends on airline chosen): {flights["price"]}\n\n"
     f"- Hotels: (average the hotel options)\n\n"
     f"- Meals and activities(Estimated): Estimate activities and food price here\n\n"
     f"- Total: (add the whole budget together)\n\n"
 
     f"**Additional Tips:**\n"
     f"- Provide useful travel tips, such as advice on local customs, transportation options (e.g., metro, taxis), and "
-    f"any cultural insights specific to {city_destination}.\n\n"
+    f"any cultural insights specific to {destination}.\n\n"
 
     f"Ensure that the plan is practical, engaging, and inspiring. The tone should be exciting and easy to follow, "
     f"with clear steps for the traveler to enjoy their journey."
@@ -532,14 +530,35 @@ def flights_and_hotels():
     }
     return jsonify(response)
 
-@app.route('/api/first_step', methods=['POST'])
+@app.route('/api/second_step', methods=['POST'])
 def response():
     data = request.get_json()
-    hotel_name = data.get('departure_city')
-    hotel_price = data.get('destination_city')
-    airline_name = data.get('budget_range')
-    flight_price = data.get('departure_date')
-    flight_url = data.get('return_date')
+    flights = data.get('selectedFlight')
+    hotels = data.get('selectedHotel')
+    departure = data.get('departure_city')
+    destination = data.get('destination_city')
+    number_of_people = data.get('number_of_people')
+    depart_date = data.get('departure_date')
+    return_date = data.get('return_date')
+
+    weather = get_average_temp(destination, depart_date)
+    lat, lng = get_coords(destination)
+    activities = get_activities(destination, lat, lng)
+
+    d1 = datetime.strptime(str(depart_date), "%Y-%m-%d")
+    d2 = datetime.strptime(str(return_date), "%Y-%m-%d")
+    duration = (d2 - d1).days
+
+    ai_response = get_openai_response(number_of_people=number_of_people, departure=departure, destination=destination, duration=duration, flights=flights, weather_info=weather, best_hotels=hotels, activities=activities)
+    
+    response = {
+        "status": "success",
+        "message": "response",
+        "details": {
+            "response": ai_response,
+        }
+    }
+    return jsonify(response)
 
 
 if __name__ == '__main__':
