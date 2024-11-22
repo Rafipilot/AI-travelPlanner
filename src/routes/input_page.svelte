@@ -67,7 +67,7 @@
 
     isLoading = true;
     try {
-      const response = await fetch("https://tpfrontend-ozcx.onrender.com/api/second_step", {
+      const response = await fetch("https://my-svelte-project.onrender.com/api/second_step", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(data),
@@ -105,7 +105,7 @@
 
     isLoading = true;
     try {
-      const response = await fetch("https://tpfrontend-ozcx.onrender.com/api/first_step", {
+      const response = await fetch("https://my-svelte-project.onrender.com/api/first_step", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(travelData)
