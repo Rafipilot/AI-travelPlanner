@@ -103,6 +103,25 @@ def get_website(name):
     first_link = search.find('a')
     return first_link['href']
 
+def get_restaurants(lat, lng):
+    ll = f"@{lat}, {lng},15.1z"
+    params = {
+    "engine": "google_maps",
+    "q": "restaurants",
+    "ll": ll,
+    "type": "search",
+    "api_key": ser_api_key
+    }
+
+    search = GoogleSearch(params)
+    results = search.get_dict()
+    local_results = results["local_results"]
+
+    restaurants  = []
+    for res in local_results:
+        restaurants .append(res["title"])
+
+    return restaurants
 
 def get_activities(city_name, lat ,lng):
 
@@ -270,7 +289,8 @@ def get_hotel_data(city_name, lat, lng, checkin, checkout, number_people):
                 hotel_data = {
                     'name': property.get('name'),
                     'price': price if price is not None else 0,
-                    'url': property.get('link', 'No URL available')
+                    'url': property.get('link', 'No URL available'),
+                    "coords": property.get('gps_coordinates')
                 }
                 hotels.append(hotel_data)
             
@@ -282,40 +302,13 @@ def get_hotel_data(city_name, lat, lng, checkin, checkout, number_people):
     except Exception as e:
         print("Error with serapi", e)
 
-    try:
-        hotel_list = amadeus.reference_data.locations.hotels.by_geocode.get(latitude = lat, longitude=lng, radius = 200)
-        if not hotel_list.data:
-            print("error occured")
-            return []
-        
-        hotel_offers = []
-        hotel_ids = [hotel['hotelId'] for hotel in hotel_list.data[:40]]  # Retrieve more hotel IDs if needed
 
-        # Fetch hotel offers based on IDs and dates
-        search_hotels = amadeus.shopping.hotel_offers_search.get(
-            hotelIds=hotel_ids,
-            checkInDate=checkin,
-            checkOutDate=checkout
-        )
-        
-        if not search_hotels.data:
-            print("error occured")
-            return []
-
-        # Process hotel offers and retrieve booking information
-        for hotel in search_hotels.data:
-            hotel_name = hotel['hotel']['name']
-            price = hotel['offers'][0]['price']['total']
-            url = get_website(hotel_name)
-            hotel_offers.append({'name': hotel_name, 'price': price, "url": url})
-        
-        return hotel_offers
     
     except Exception as e:
         print("error occured", e)
         return []
 
-def get_openai_response(number_of_people, departure, destination, duration,flights, weather_info, best_hotels, activities):
+def get_openai_response(number_of_people, departure, destination, duration,flights, weather_info, best_hotels, activities, restaurants):
     prompt = (
     f"You are an expert travel planner. Based on the details provided below, create a structured, "
     f"personalized, and informative travel plan. The plan should be balanced, staying within the given "
@@ -345,6 +338,9 @@ def get_openai_response(number_of_people, departure, destination, duration,fligh
     f"- Price (Per night):"
     f"- CLick here to book your stay at"
 
+    f"**Restaurant Options based on your hotel location:"
+    f"{restaurants}"
+
     f"**Activities and Attractions:**\n"
     f"- Based on the duration of the trip, suggest activities that are relevant to the destination. Maybe like 1-2 activites per day "
     f"actvities list: {activities}\n"
@@ -358,7 +354,7 @@ def get_openai_response(number_of_people, departure, destination, duration,fligh
 
     f"**Budget Breakdown:**\n"
     f"- Flights (depends on airline chosen): {flights['price']}\n\n"
-    f"- Hotels: (average the hotel options)\n\n"
+    f"- Hotels: \n\n"
     f"- Meals and activities(Estimated): Estimate activities and food price here\n\n"
     f"- Total: (add the whole budget together)\n\n"
 
@@ -416,12 +412,11 @@ def travel_agent():
     
     hotels = get_hotel_data(destination, lat, lng, str(depart_date), str(return_date),number_people=number_of_people )
 
-    print(departure, destination, depart_date, number_of_people)
     departure_id = get_freebase_id(departure)
     destination_id = get_freebase_id(destination)
     
     flights = get_flight_price(departure_id, destination_id, str(depart_date), str(return_date), adults=number_of_people)
-    print(flights)
+
     flights_prices = []
     for flight in flights:
         flights_prices.append(flight["price"])
@@ -482,19 +477,18 @@ def flights_and_hotels():
     duration = (d2 - d1).days
 
 
-    print(depart_date, return_date)
+
     lat, lng = get_coords(destination)
 
     Cost = int(0)
     
     hotels = get_hotel_data(destination, lat, lng, str(depart_date), str(return_date),number_people=number_of_people )
 
-    print(departure, destination, depart_date, number_of_people)
     departure_id = get_freebase_id(departure)
     destination_id = get_freebase_id(destination)
-    print(departure_id, destination_id, depart_date, return_date, number_of_people)
+
     flights = get_flight_price(departure_id, destination_id, str(depart_date), str(return_date), adults=number_of_people)
-    print(flights)
+
     flights_prices = []
     for flight in flights:
         flights_prices.append(flight["price"])
@@ -523,7 +517,7 @@ def flights_and_hotels():
 
         # Sort by price difference and select the top 4
         min_price_diffs = sorted(min_price_diffs, key=lambda x: x[1])[:4]
-        best_hotels = [[hotel['name'], hotel['price'], hotel['url']] for hotel, diff in min_price_diffs]
+        best_hotels = [[hotel['name'], hotel['price'], hotel['url'], hotel['coords']] for hotel, diff in min_price_diffs]
 
         response = {
         "status": "success",
@@ -547,14 +541,21 @@ def response():
     return_date = data.get('return_date')
 
     weather = get_average_temp(destination, depart_date)
-    lat, lng = get_coords(destination)
+    lat= hotels[3]['latitude']
+    lng = hotels[3] ['longitude']
+    print(lat, lng)
+
+    res = get_restaurants(lat, lng)
+    print(res)
+
     activities = get_activities(destination, lat, lng)
+
 
     d1 = datetime.strptime(str(depart_date), "%Y-%m-%d")
     d2 = datetime.strptime(str(return_date), "%Y-%m-%d")
     duration = (d2 - d1).days
 
-    ai_response = get_openai_response(number_of_people=number_of_people, departure=departure, destination=destination, duration=duration, flights=flights, weather_info=weather, best_hotels=hotels, activities=activities)
+    ai_response = get_openai_response(number_of_people=number_of_people, departure=departure, destination=destination, duration=duration, flights=flights, weather_info=weather, best_hotels=hotels, activities=activities, restaurants=res)
     
     response = {
         "status": "success",
