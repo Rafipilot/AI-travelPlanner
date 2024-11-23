@@ -308,7 +308,7 @@ def get_hotel_data(city_name, lat, lng, checkin, checkout, number_people):
         print("error occured", e)
         return []
 
-def get_openai_response(number_of_people, departure, destination, duration,flights, weather_info, best_hotels, activities, restaurants):
+def get_openai_response(number_of_people, departure, destination, duration,flights, weather_info, best_hotels, activities, restaurants, cost, budget, per_person_cost):
     prompt = (
     f"You are an expert travel planner. Based on the details provided below, create a structured, "
     f"personalized, and informative travel plan. The plan should be balanced, staying within the given "
@@ -321,6 +321,7 @@ def get_openai_response(number_of_people, departure, destination, duration,fligh
     f"- Number of Travelers: {number_of_people}\n"
     f"- Departure Location: {departure}\n"
     f"- Destination Location: {destination}\n\n"
+    f"- Budget: {budget}"
 
     f"**Flight Information:**\n"
     f"Info: {flights} "
@@ -354,9 +355,9 @@ def get_openai_response(number_of_people, departure, destination, duration,fligh
 
     f"**Budget Breakdown:**\n"
     f"- Flights (depends on airline chosen): {flights['price']}\n\n"
-    f"- Hotels: \n\n"
-    f"- Meals and activities(Estimated): Estimate activities and food price here\n\n"
-    f"- Total: (add the whole budget together)\n\n"
+    f"- Hotels: {best_hotels[1]}\n\n"
+    f"- Meals and activities: {per_person_cost}\n\n"
+    f"- Total: {cost}\n\n"
 
     f"**Additional Tips:**\n"
     f"- Provide useful travel tips, such as advice on local customs, transportation options (e.g., metro, taxis), and "
@@ -379,87 +380,6 @@ def get_openai_response(number_of_people, departure, destination, duration,fligh
         return "Error with Openai Gpt-3"
 
 #route definitions
-@app.route('/api/travel', methods=['POST'])
-def travel_agent():
-    data = request.get_json()
-    departure = data.get('departure_city')
-    destination = data.get('destination_city')
-    number_of_people = data.get('number_of_people')
-    budget = data.get('budget_range')
-    depart_date = data.get('departure_date')
-    return_date = data.get('return_date')
-
-    print(departure, destination)
-
-    d1 = datetime.strptime(str(depart_date), "%Y-%m-%d")
-    d2 = datetime.strptime(str(return_date), "%Y-%m-%d")
-    duration = (d2 - d1).days
-
-
-    print(depart_date, return_date)
-    lat, lng = get_coords(destination)
-    activities = get_activities(destination, lat, lng)
-    random.shuffle(activities)
-    activities_to_return = []
-    for i in range(duration):
-        activities_to_return.append(activities[i])
-
-    Cost = int(0)
-    # Calculate duration and validate dates
-
-    weather_info = get_average_temp(destination, depart_date)
-
-    
-    hotels = get_hotel_data(destination, lat, lng, str(depart_date), str(return_date),number_people=number_of_people )
-
-    departure_id = get_freebase_id(departure)
-    destination_id = get_freebase_id(destination)
-    
-    flights = get_flight_price(departure_id, destination_id, str(depart_date), str(return_date), adults=number_of_people)
-
-    flights_prices = []
-    for flight in flights:
-        flights_prices.append(flight["price"])
-    average_price = sum(flights_prices)/len(flights_prices)
-    print(average_price)
-
-    Cost = Cost + average_price
-    hotel_info = ""
-    per_night_budget = (int(budget - int(average_price))) - 100 * duration
-    # Initialize variables
-    
-    best_hotels = []
-    min_price_diffs = []
-
-    # Find the four hotels with prices closest to the budget
-    for hotel in hotels:
-        hotel_info += f"- **{hotel['name']}**\n"
-        hotel_info += f"  - Price: {hotel['price'] * (duration - 1)}\n"
-        hotel_info += f"  - [Click here to book]({hotel['url']})\n"
-
-        price = int(float(hotel['price']))
-        price_diff = abs(per_night_budget - price)
-        
-        # Add each hotel to the list with its price difference
-        min_price_diffs.append((hotel, price_diff))
-
-        # Sort by price difference and select the top 4
-        min_price_diffs = sorted(min_price_diffs, key=lambda x: x[1])[:4]
-        best_hotels = [[hotel['name'], hotel['price'], hotel['url']] for hotel, diff in min_price_diffs]
-
-    openai_response = get_openai_response(budget, depart_date, return_date, number_of_people, departure, destination, duration, flights=flights, flight_price=average_price, weather_info=weather_info, best_hotels=best_hotels, activities=activities, Cost=Cost, city_destination=destination)
-
-    response = {
-        "status": "success",
-        "message": "Travel details received",
-        "details": {
-            "openai_response": openai_response,
-            "flights": flights,
-            "best_hotels": best_hotels,
-            "activities": activities_to_return,
-        }
-    }
-    return jsonify(response)
 
 
 @app.route('/api/first_step', methods=['POST'])
@@ -539,15 +459,16 @@ def response():
     number_of_people = data.get('number_of_people')
     depart_date = data.get('departure_date')
     return_date = data.get('return_date')
+    budget = data.get('budget')
+
+
 
     weather = get_average_temp(destination, depart_date)
     lat= hotels[3]['latitude']
     lng = hotels[3] ['longitude']
-    print(lat, lng)
+
 
     res = get_restaurants(lat, lng)
-    print(res)
-
     activities = get_activities(destination, lat, lng)
 
 
@@ -555,7 +476,13 @@ def response():
     d2 = datetime.strptime(str(return_date), "%Y-%m-%d")
     duration = (d2 - d1).days
 
-    ai_response = get_openai_response(number_of_people=number_of_people, departure=departure, destination=destination, duration=duration, flights=flights, weather_info=weather, best_hotels=hotels, activities=activities, restaurants=res)
+    cost = 0  
+    per_person_cost = int(number_of_people)*50*int(duration)
+    print(number_of_people, duration)
+    print("per person",per_person_cost)
+    cost = cost + int(hotels[1]) + int(flights['price']) + int(per_person_cost)
+
+    ai_response = get_openai_response(number_of_people=number_of_people, departure=departure, destination=destination, duration=duration, flights=flights, weather_info=weather, best_hotels=hotels, activities=activities, restaurants=res, cost=cost, budget=budget, per_person_cost=per_person_cost)
     
     response = {
         "status": "success",

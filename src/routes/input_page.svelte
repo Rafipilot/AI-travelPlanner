@@ -63,6 +63,7 @@
       number_of_people,
       departure_date: departureDate,
       return_date: returnDate,
+      budget: budget,
     };
 
     isLoading = true;
