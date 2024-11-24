@@ -355,7 +355,7 @@ def get_openai_response(number_of_people, departure, destination, duration,fligh
 
     f"**Budget Breakdown:**\n"
     f"- Flights (depends on airline chosen): {flights['price']}\n\n"
-    f"- Hotels: {best_hotels[1]}\n\n"
+    f"- Hotels: {best_hotels[1]*int(duration)}\n\n" #fix budget
     f"- Meals and activities: {per_person_cost}\n\n"
     f"- Total: {cost}\n\n"
 
@@ -560,7 +560,7 @@ def response():
     per_person_cost = int(number_of_people)*50*int(duration)
     print(number_of_people, duration)
     print("per person",per_person_cost)
-    cost = cost + int(hotels[1]) + int(flights['price']) + int(per_person_cost)
+    cost = cost + int(hotels[1]*int(duration)) + int(flights['price']) + int(per_person_cost)
 
     ai_response = get_openai_response(number_of_people=number_of_people, departure=departure, destination=destination, duration=duration, flights=flights, weather_info=weather, best_hotels=hotels, activities=activities, restaurants=res, cost=cost, budget=budget, per_person_cost=per_person_cost)
     
