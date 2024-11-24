@@ -325,10 +325,10 @@ def get_openai_response(number_of_people, departure, destination, duration,fligh
 
     f"**Flight Information:**\n"
     f"Info: {flights} "
-    f"- Airline: \n"
-    f"- Price: $ (Return tickets)\n"
+    f"- Airline: {flights["airlines"][0]}\n"
+    f"- Price: {flights["price"]}$ (Return tickets)\n"
     f"- Flight Details: Departure from {departure} and return from {destination}. Include flight duration and any relevant details.\n\n"
-    f"- URL to bookling page of airline, try to find it if possible, if not then just leave it out"
+    f"- URL to bookling page of airline: {flights["url"]}"
 
     f"**Weather info**"
     f"{weather_info}"
@@ -488,11 +488,14 @@ def flights_and_hotels():
     destination_id = get_freebase_id(destination)
 
     flights = get_flight_price(departure_id, destination_id, str(depart_date), str(return_date), adults=number_of_people)
-
-    flights_prices = []
-    for flight in flights:
-        flights_prices.append(flight["price"])
-    average_price = sum(flights_prices)/len(flights_prices)
+    try:
+        flights_prices = []
+        for flight in flights:
+            flights_prices.append(flight["price"])
+        average_price = sum(flights_prices)/len(flights_prices)
+    except Exception as e:
+        print("Could not find any flight options", e)
+        average_price = 0
     print(average_price)
 
     Cost = Cost + average_price
@@ -540,7 +543,6 @@ def response():
     depart_date = data.get('departure_date')
     return_date = data.get('return_date')
     budget = data.get('budget')
-
 
 
     weather = get_average_temp(destination, depart_date)
