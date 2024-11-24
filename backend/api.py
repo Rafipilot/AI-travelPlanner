@@ -348,7 +348,7 @@ def get_openai_response(number_of_people, departure, destination, duration,fligh
     f"- Include brief descriptions of each activity and links to booking or more details if available.\n\n"
 
     f"**Day-by-Day Itinerary:**\n"
-    f"- Create a detailed day-by-day itinerary based on the trip duration. Include suggested times for activities, "
+    f"- Create a detailed day-by-day itinerary based on the trip duration. Include suggested times for activities listed above, when yuou recommend restaurants, pick from the given ones. "
     f"transportation tips, and meal recommendations.\n"
     f"Include the days that the Traveller(s) arrive"
     f"- Balance the itinerary to avoid overwhelming the traveler, but also ensure that the trip is fulfilling and diverse.\n\n"
