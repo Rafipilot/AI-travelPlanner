@@ -326,7 +326,7 @@ def get_openai_response(number_of_people, departure, destination, duration,fligh
     f"**Flight Information:**\n"
     f"Info: {flights} "
     f"- Airline: {flights['airlines'][0]}\n"
-    f"- Price: {flights["price"]}$ (Return tickets)\n"
+    f"- Price: {flights['price']}$ (Return tickets)\n"
     f"- Flight Details: Departure from {departure} and return from {destination}. Include flight duration and any relevant details.\n\n"
     f"- URL to bookling page of airline: {flights['url']}"
 
