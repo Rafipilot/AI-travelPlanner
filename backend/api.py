@@ -500,7 +500,8 @@ def flights_and_hotels():
 
     Cost = Cost + average_price
     hotel_info = ""
-    per_night_budget = (int(budget - int(average_price))) - 100 * duration
+    per_night_budget = (int(budget - int(average_price))) - (100*int(duration)*int(number_of_people))
+    print(per_night_budget)
     # Initialize variables
     
     best_hotels = []
@@ -508,9 +509,13 @@ def flights_and_hotels():
 
     # Find the four hotels with prices closest to the budget
     for hotel in hotels:
+        if hotel['price'] == 0:
+            continue
         hotel_info += f"- **{hotel['name']}**\n"
         hotel_info += f"  - Price: {hotel['price'] * (duration - 1)}\n"
         hotel_info += f"  - [Click here to book]({hotel['url']})\n"
+
+
 
         price = int(float(hotel['price']))
         price_diff = abs(per_night_budget - price)
