@@ -171,6 +171,7 @@
 
   {#if isLoading}
     <div class="spinner"></div>
+    <p id="loading_text">Loading, this could take up to 3 minutes</p>
   {/if}
 
   {#if apiResponse && !aiResponsePage}

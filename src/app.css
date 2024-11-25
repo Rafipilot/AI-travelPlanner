@@ -199,3 +199,7 @@ abs Container */
   align-items: center;
 
 }
+
+#loading_text {
+  text-align: center;
+}
