@@ -102,7 +102,11 @@ def get_website(name):
     search = soup.find(id = 'search')
     if search is not None:
         first_link = search.find('a')
-        return first_link['href']
+        try:
+            return first_link['href']
+        except Exception as e:
+            first_link = None
+            return  "none found"
     else:
         first_link = None
         return "none found"
@@ -374,7 +378,7 @@ def get_openai_response(number_of_people, departure, destination, duration,fligh
         response = client.chat.completions.create(
         model="gpt-3.5-turbo",
         messages=[{"role": "system", "content": prompt}],
-        max_tokens=1200,
+        max_tokens=2000,
         temperature=0.7,
         )
         travel_plan = response.choices[0].message.content
