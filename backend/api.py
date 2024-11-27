@@ -100,8 +100,12 @@ def get_website(name):
     content = requests.get(url, headers = headers, params = parameters).text
     soup = BeautifulSoup(content, 'html.parser')
     search = soup.find(id = 'search')
-    first_link = search.find('a')
-    return first_link['href']
+    if search is not None:
+        first_link = search.find('a')
+        return first_link['href']
+    else:
+        first_link = None
+        return "none found"
 
 def get_restaurants(lat, lng):
     ll = f"@{lat}, {lng},15.1z"
@@ -343,7 +347,7 @@ def get_openai_response(number_of_people, departure, destination, duration,fligh
     f"{restaurants}"
 
     f"**Activities and Attractions:**\n"
-    f"- Based on the duration of the trip, suggest activities that are relevant to the destination. Maybe like 1-2 activites per day "
+    f"- Based on the duration of the trip, suggest activities that are relevant to the destination. Maybe like 1-2 activites per day in a list format"
     f"actvities list: {activities}\n"
     f"- Include brief descriptions of each activity and links to booking or more details if available.\n\n"
 
@@ -557,6 +561,12 @@ def response():
 
     res = get_restaurants(lat, lng)
     activities = get_activities(destination, lat, lng)
+    activities_array  = []
+    for activity in activities:
+        url = get_website((str(activity)+" tickets"))
+        activities_array.append([activity, url])
+    print("activities array", activities_array)
+
 
 
     d1 = datetime.strptime(str(depart_date), "%Y-%m-%d")
@@ -569,7 +579,7 @@ def response():
     print("per person",per_person_cost)
     cost = cost + int(hotels[1]*int(duration)) + int(flights['price']) + int(per_person_cost)
 
-    ai_response = get_openai_response(number_of_people=number_of_people, departure=departure, destination=destination, duration=duration, flights=flights, weather_info=weather, best_hotels=hotels, activities=activities, restaurants=res, cost=cost, budget=budget, per_person_cost=per_person_cost)
+    ai_response = get_openai_response(number_of_people=number_of_people, departure=departure, destination=destination, duration=duration, flights=flights, weather_info=weather, best_hotels=hotels, activities=activities_array, restaurants=res, cost=cost, budget=budget, per_person_cost=per_person_cost)
     
     response = {
         "status": "success",
