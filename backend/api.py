@@ -376,6 +376,7 @@ def get_openai_response(number_of_people, departure, destination, duration,fligh
     f"with clear steps for the traveler to enjoy their journey."
 )
     try:
+
         response = client.chat.completions.create(
         model="gpt-3.5-turbo",
         messages=[{"role": "system", "content": prompt}],
@@ -383,7 +384,10 @@ def get_openai_response(number_of_people, departure, destination, duration,fligh
         temperature=0.7,
         )
         travel_plan = response.choices[0].message.content
+        print("success")
+        print(travel_plan)
         return travel_plan
+    
     except Exception as e:
         print("Api error with openai : ", e)
         return "Error with Openai Gpt-3"
