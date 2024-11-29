@@ -127,7 +127,7 @@ def get_restaurants(lat, lng):
 
     restaurants  = []
     for res in local_results:
-        temp_array = [res['title'], res['website']]
+        temp_array = [res.get('title', 'No Title'), res.get('website', 'No Website')]
         restaurants.append(temp_array)
 
     return restaurants
