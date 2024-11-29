@@ -127,7 +127,8 @@ def get_restaurants(lat, lng):
 
     restaurants  = []
     for res in local_results:
-        restaurants .append(res["title"])
+        temp_array = [res['title'], res['website']]
+        restaurants.append(temp_array)
 
     return restaurants
 
@@ -350,6 +351,9 @@ def get_openai_response(number_of_people, departure, destination, duration,fligh
 
     f"**Restaurant Options based on your hotel location:"
     f"{restaurants}"
+
+    f"name"
+    f"  -url"
 
     f"**Activities and Attractions:**\n"
     f"- Based on the duration of the trip, suggest activities that are relevant to the destination. Maybe like 1-2 activites per day in a list format"
