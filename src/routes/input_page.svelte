@@ -43,13 +43,13 @@
   });
 
   const selectDestinationCity = async (city) => {
-    destination_city = `${city.city}, ${city.country}`;
+    destination_city = `${city.city}`;
     await tick(); // Ensure DOM is updated before changing the searchQuery
     Destination_searchQuery = destination_city; // Update the input value
   };
 
   const selectDepartureCity = async (city) => {
-  departure_city = `${city.city}, ${city.country}`;
+  departure_city = `${city.city}`;
   await tick(); // Ensure DOM is updated before changing the searchQuery
   Departure_searchQuery = departure_city; // Update the input value
 };
