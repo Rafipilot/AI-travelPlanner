@@ -1,15 +1,8 @@
 <script>
   import { onMount } from 'svelte';
+  import Select from "svelte-select";
+  import { tick } from 'svelte';
 
-  onMount(() => {
-      const script = document.createElement('script');
-      script.src = 'https://md-block.verou.me/md-block.js';
-      script.type = 'module';
-      script.onload = () => {
-        console.log('md-block script loaded');
-      };
-      document.head.appendChild(script);
-    });
 
 
   let destination_city = "";
@@ -26,15 +19,64 @@
   let availableHotels = [];
   let showGenerateButton = false;
   let showAIResponse = false;
-  let aiResponsePage = false; // New flag for navigating to the AI response page
+  let aiResponsePage = false; 
+  let cities = [];
+  let Departure_searchQuery = "";
+  let Destination_searchQuery = "";
+  let filteredCities = [];
+  let showDepartureDropdown = false;
+  let showDestinationDropdown = false;
 
-  function handleDepartureCityChange(event) {
-    departure_city = event.target.value;
-  }
 
-  function handleDestinationCityChange(event) {
-    destination_city = event.target.value;
-  }
+  fetch('/cities.json')
+  .then(response => {
+    console.log(response); // Log the response to inspect it
+    
+    return response.json();
+  })
+  .then(data => {
+    console.log(data); // Log the parsed data to check the structure
+    cities = data;
+  })
+  .catch(error => {
+    console.error('Error loading cities:', error);
+  });
+
+  const selectDestinationCity = async (city) => {
+    destination_city = `${city.city}, ${city.country}`;
+    await tick(); // Ensure DOM is updated before changing the searchQuery
+    Destination_searchQuery = destination_city; // Update the input value
+  };
+
+  const selectDepartureCity = async (city) => {
+  departure_city = `${city.city}, ${city.country}`;
+  await tick(); // Ensure DOM is updated before changing the searchQuery
+  Departure_searchQuery = departure_city; // Update the input value
+};
+
+
+
+
+  $: filteredDepartureCities = cities.filter(city =>
+    city.city.toLowerCase().includes(Departure_searchQuery.toLowerCase())
+  );
+
+  $: filteredDestinationCities = cities.filter(city =>
+    city.city.toLowerCase().includes(Destination_searchQuery.toLowerCase())
+  );
+
+
+  onMount(async () => {
+
+    const script = document.createElement('script');
+      script.src = 'https://md-block.verou.me/md-block.js';
+      script.type = 'module';
+      script.onload = () => {
+        console.log('md-block script loaded');
+      };
+      document.head.appendChild(script);
+  });
+  
 
   function handleNumberPeopleChange(event) {
     number_of_people = event.target.value;
@@ -148,11 +190,54 @@
   {#if !apiResponse && !aiResponsePage}
     <div id="mainPage">
       <h1>Travel Details</h1>
-      <h4>Step 1: Select Departure City</h4>
-      <input type="text" placeholder="Enter Departure City" bind:value="{departure_city}" on:input="{handleDepartureCityChange}" />
 
-      <h4>Step 2: Select Destination City</h4>
-      <input type="text" placeholder="Enter Destination City" bind:value="{destination_city}" on:input="{handleDestinationCityChange}" />
+      <div class="search-container">
+        <!-- Destination Search -->
+        <input
+          type="text"
+          bind:value="{Destination_searchQuery}"
+          placeholder="{destination_city === '' ? 'Search destination cities...' : destination_city}"
+          on:focus="{() => showDestinationDropdown = true}"
+          on:blur="{() => setTimeout(() => showDestinationDropdown = false, 100)}" 
+        />
+      
+        {#if showDestinationDropdown && filteredDestinationCities.length > 0}
+          <ul class="dropdown">
+            {#each filteredDestinationCities as city}
+              <li 
+                on:click="{() => selectDestinationCity(city)}"
+              >
+                {city.city}, {city.country}
+              </li>
+            {/each}
+          </ul>
+        {/if}
+      
+        <!-- Departure Search -->
+        <input
+          type="text"
+          bind:value="{Departure_searchQuery}"
+          placeholder="{departure_city === '' ? 'Search departure cities...' : departure_city}"
+          on:focus="{() => showDepartureDropdown = true}"
+          on:blur="{() => setTimeout(() => showDepartureDropdown = false, 100)}" 
+        />
+      
+        {#if showDepartureDropdown && filteredDepartureCities.length > 0}
+          <ul class="dropdown">
+            {#each filteredDepartureCities as city}
+              <li 
+                on:click="{() => selectDepartureCity(city)}"
+              >
+                {city.city}, {city.country}
+              </li>
+            {/each}
+          </ul>
+        {/if}
+      </div>
+      
+    
+      </div>
+      
 
       <h4>Step 3: Number of People</h4>
       <input type="number" placeholder="Number of People" bind:value="{number_of_people}" on:input="{handleNumberPeopleChange}" />
@@ -166,7 +251,7 @@
       <input type="date" min="{departureDate}" bind:value="{returnDate}" on:input="{handleReturnDateChange}" />
 
       <button on:click="{generate}">Ask your personalized travel agent</button>
-    </div>
+
   {/if}
 
   {#if isLoading}
@@ -184,7 +269,13 @@
         <select id="flightSelect" on:change="{handleFlightSelection}">
           <option value="">-- Select a Flight --</option>
           {#each availableFlights as flight, index}
-            <option value="{index}">{flight.airlines.join(", ")} - {flight.price}$</option>
+          <option value="{index}">
+            {#if flight.airlines && Array.isArray(flight.airlines)}
+              {flight.airlines.join(", ")} - {flight.price}$
+            {:else}
+              No airlines available - {flight.price}$
+            {/if}
+          </option>
           {/each}
         </select>
       </div>
