@@ -100,8 +100,16 @@ def get_website(name):
     content = requests.get(url, headers = headers, params = parameters).text
     soup = BeautifulSoup(content, 'html.parser')
     search = soup.find(id = 'search')
-    first_link = search.find('a')
-    return first_link['href']
+    if search is not None:
+        first_link = search.find('a')
+        try:
+            return first_link['href']
+        except Exception as e:
+            first_link = None
+            return  "none found"
+    else:
+        first_link = None
+        return "none found"
 
 def get_restaurants(lat, lng):
     ll = f"@{lat}, {lng},15.1z"
@@ -119,7 +127,8 @@ def get_restaurants(lat, lng):
 
     restaurants  = []
     for res in local_results:
-        restaurants .append(res["title"])
+        temp_array = [res.get('title', 'No Title'), res.get('website', 'No Website')]
+        restaurants.append(temp_array)
 
     return restaurants
 
@@ -295,6 +304,7 @@ def get_hotel_data(city_name, lat, lng, checkin, checkout, number_people):
                 hotels.append(hotel_data)
             
             if len(hotels) != 0:
+                print("hotels: ", hotels)
                 return hotels
             else:
                 print(hotels)
@@ -342,13 +352,16 @@ def get_openai_response(number_of_people, departure, destination, duration,fligh
     f"**Restaurant Options based on your hotel location:"
     f"{restaurants}"
 
+    f"name"
+    f"  -url"
+
     f"**Activities and Attractions:**\n"
-    f"- Based on the duration of the trip, suggest activities that are relevant to the destination. Maybe like 1-2 activites per day "
+    f"- Based on the duration of the trip, suggest activities that are relevant to the destination. Maybe like 1-2 activites per day in a list format"
     f"actvities list: {activities}\n"
     f"- Include brief descriptions of each activity and links to booking or more details if available.\n\n"
 
     f"**Day-by-Day Itinerary:**\n"
-    f"- Create a detailed day-by-day itinerary based on the trip duration. Include suggested times for activities listed above, when yuou recommend restaurants, pick from the given ones. "
+    f"- Create a full detailed day-by-day itinerary based on the trip duration. Include suggested times for activities listed above, when yuou recommend restaurants, pick from the given ones. "
     f"transportation tips, and meal recommendations.\n"
     f"Include the days that the Traveller(s) arrive"
     f"- Balance the itinerary to avoid overwhelming the traveler, but also ensure that the trip is fulfilling and diverse.\n\n"
@@ -367,14 +380,18 @@ def get_openai_response(number_of_people, departure, destination, duration,fligh
     f"with clear steps for the traveler to enjoy their journey."
 )
     try:
+
         response = client.chat.completions.create(
         model="gpt-3.5-turbo",
         messages=[{"role": "system", "content": prompt}],
-        max_tokens=1200,
+        max_tokens=2000,
         temperature=0.7,
         )
         travel_plan = response.choices[0].message.content
+        print("success")
+        print(travel_plan)
         return travel_plan
+    
     except Exception as e:
         print("Api error with openai : ", e)
         return "Error with Openai Gpt-3"
@@ -557,6 +574,11 @@ def response():
 
     res = get_restaurants(lat, lng)
     activities = get_activities(destination, lat, lng)
+    activities_array  = []
+    for activity in activities:
+        url = get_website((str(activity)+" tickets"))
+        activities_array.append([activity, url])
+
 
 
     d1 = datetime.strptime(str(depart_date), "%Y-%m-%d")
@@ -569,7 +591,7 @@ def response():
     print("per person",per_person_cost)
     cost = cost + int(hotels[1]*int(duration)) + int(flights['price']) + int(per_person_cost)
 
-    ai_response = get_openai_response(number_of_people=number_of_people, departure=departure, destination=destination, duration=duration, flights=flights, weather_info=weather, best_hotels=hotels, activities=activities, restaurants=res, cost=cost, budget=budget, per_person_cost=per_person_cost)
+    ai_response = get_openai_response(number_of_people=number_of_people, departure=departure, destination=destination, duration=duration, flights=flights, weather_info=weather, best_hotels=hotels, activities=activities_array, restaurants=res, cost=cost, budget=budget, per_person_cost=per_person_cost)
     
     response = {
         "status": "success",
