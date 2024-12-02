@@ -259,7 +259,7 @@
   <input type="date" bind:value="{departureDate}" on:input="{handleDepartureDateChange}" />
   <input type="date" min="{departureDate}" bind:value="{returnDate}" on:input="{handleReturnDateChange}" />
 
-  <h4>Step 6: Optionally enter your email address so we can send a copy straight to your inbox</h4>
+  <h4>Step 6: Optionally enter your email address so we can send a copy of your personalized travel plan straight to your inbox</h4>
   <input type="email" placeholder="youremail@example.com" bind:value="{user_email}" on:input="{handleEmailChange}"/>
 
   <button on:click="{generate}">Ask your personalized travel agent</button>

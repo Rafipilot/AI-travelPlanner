@@ -14,6 +14,7 @@ import os
 import smtplib
 from email.mime.text import MIMEText
 from email.mime.multipart import MIMEMultipart
+import markdown2
 
 load_dotenv()
 
@@ -49,6 +50,17 @@ amadeus = Client(
     client_id=am_key,
     client_secret=am_auth
 )
+
+def preprocess_markdown(content):   #processes gpt output to prepare for email
+    # Add double spaces at the end of bullet points for proper line breaks
+    lines = content.splitlines()
+    processed_lines = []
+    for line in lines:
+        if line.strip().startswith(("-", "*")):  # Bullet points
+            processed_lines.append(line + "  ")  # Add double space for line break
+        else:
+            processed_lines.append(line)
+    return "\n".join(processed_lines)
 
 def get_freebase_id(city_name):
     # Ensure the city name is properly capitalized (first letter uppercase)
@@ -599,25 +611,36 @@ def response():
 
     ai_response = get_openai_response(number_of_people=number_of_people, departure=departure, destination=destination, duration=duration, flights=flights, weather_info=weather, best_hotels=hotels, activities=activities_array, restaurants=res, cost=cost, budget=budget, per_person_cost=per_person_cost)
     
+
     sender_email = "rafayellatif19@gmail.com"
-    receiver_email = user_email
-    password = "ulfl vgfa vjvx znsp"  # Use an App Password if applicable
-    subject = "Your AI Generated Travel Plan"
-    msg = MIMEMultipart()
+    receiver_email = "rafayel.latif@gmail.com"
+    password = "ulfl vgfa vjvx znsp"
+
+
+    processed_ai_response = preprocess_markdown(ai_response)
+
+    # Convert Markdown to HTML
+    html_content = markdown2.markdown(processed_ai_response)
+
+    # Email setup
+    msg = MIMEMultipart("alternative")
     msg['From'] = sender_email
     msg['To'] = receiver_email
-    msg['Subject'] = subject
-    msg.attach(MIMEText(ai_response, 'plain'))
+    msg['Subject'] = "AI Travel Plan!"
 
+    # Attach both plain text and HTML versions
+    msg.attach(MIMEText(processed_ai_response, "plain"))  # Plain text version
+    msg.attach(MIMEText(html_content, "html"))  # HTML version
+
+    # Send the email
     try:
-        # Connect to the Gmail SMTP server
         server = smtplib.SMTP('smtp.gmail.com', 587)
-        server.starttls()  # Upgrade to secure connection
+        server.starttls()
         server.login(sender_email, password)
         server.sendmail(sender_email, receiver_email, msg.as_string())
-        print("Email sent successfully!")
+        print("Markdown email sent successfully!")
     except Exception as e:
-        print(f"Error: {e}")
+        print(f"Failed to send email: {e}")
     finally:
         server.quit()
 
