@@ -8,14 +8,13 @@ body {
   line-height: 1.6;
 }
 
-/* Sub-title */
 #sub-title {
   font-size: 1.5rem;
   margin: 0.5rem 0;
   color: #0066cc;
 }
 
-/* Main Container */
+
 main {
   max-width: 900px;
   margin: 50px auto;
@@ -26,7 +25,7 @@ main {
   border: 1px solid #ddd;
 }
 
-/* Heading */
+
 h1 {
   text-align: center;
   font-size: 2.2em;
@@ -35,7 +34,7 @@ h1 {
   font-weight: 700;
 }
 
-/* Form Labels */
+
 label {
   font-size: 1em;
   font-weight: bold;
@@ -44,7 +43,7 @@ label {
   color: #555;
 }
 
-/* Form Inputs */
+
 input, select {
   width: 100%;
   padding: 12px 15px;
@@ -64,13 +63,13 @@ input:focus, select:focus {
   box-shadow: 0 0 8px rgba(74, 144, 226, 0.2);
 }
 
-/* Budget Range Labels */
+
 span {
   font-size: 1em;
   color: #777;
 }
 
-/* Links and Buttons */
+
 #links {
   color: inherit;
   text-decoration: none;
@@ -142,7 +141,7 @@ abs Container */
   box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
 }
 
-/* Spinner Styles */
+
 .spinner {
   border: 4px solid rgba(0, 0, 0, 0.1);
   border-radius: 50%;
@@ -159,10 +158,14 @@ abs Container */
   }
 }
 
-/* Responsive Design */
+
 @media (max-width: 768px) {
   main {
     padding: 20px;
+  }
+
+  #sub-title {
+    font-size: 1rem;
   }
 
   input, select {
@@ -170,7 +173,7 @@ abs Container */
   }
 }
 
-/* Hidden Content */
+
 .tabContent {
   display: none;
 }
