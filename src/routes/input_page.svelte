@@ -1,6 +1,6 @@
 <script>
   import { onMount } from 'svelte';
-  import Select from "svelte-select";
+
   import { tick } from 'svelte';
 
 
