@@ -200,30 +200,10 @@
       <h1>Travel Details</h1>
 
       <div class="search-container">
-<!-- Destination Search -->
-<h4>Step 1: Enter your detination city</h4>
-<input
-  type="text"
-  bind:value="{Destination_searchQuery}"
-  placeholder="{destination_city === '' ? 'Search destination cities...' : destination_city}"
-  on:focus="{() => showDestinationDropdown = true}"
-  on:blur="{() => setTimeout(() => showDestinationDropdown = false, 200)}"
-/>
 
-{#if showDestinationDropdown && filteredDestinationCities.length > 0}
-  <ul class="dropdown">
-    {#each filteredDestinationCities as city}
-      <li
-        on:mousedown="{() => selectDestinationCity(city)}"
-      >
-        {city.city}, {city.country}
-      </li>
-    {/each}
-  </ul>
-{/if}
 
 <!-- Departure Search -->
-<h4>Step 2: Enter your departure city</h4>
+<h4>Step 1: Enter your departure city</h4>
 <input
   type="text"
   bind:value="{Departure_searchQuery}"
@@ -237,6 +217,27 @@
     {#each filteredDepartureCities as city}
       <li
         on:mousedown="{() => selectDepartureCity(city)}"
+      >
+        {city.city}, {city.country}
+      </li>
+    {/each}
+  </ul>
+{/if}
+<!-- Destination Search -->
+<h4>Step 2: Enter your detination city</h4>
+<input
+  type="text"
+  bind:value="{Destination_searchQuery}"
+  placeholder="{destination_city === '' ? 'Search destination cities...' : destination_city}"
+  on:focus="{() => showDestinationDropdown = true}"
+  on:blur="{() => setTimeout(() => showDestinationDropdown = false, 200)}"
+/>
+
+{#if showDestinationDropdown && filteredDestinationCities.length > 0}
+  <ul class="dropdown">
+    {#each filteredDestinationCities as city}
+      <li
+        on:mousedown="{() => selectDestinationCity(city)}"
       >
         {city.city}, {city.country}
       </li>
