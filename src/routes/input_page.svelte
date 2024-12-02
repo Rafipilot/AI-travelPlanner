@@ -43,6 +43,7 @@
   });
 
   const selectDestinationCity = async (city) => {
+    console.log("dest: ", city)
     destination_city = `${city.city}`;
     await tick(); // Ensure DOM is updated before changing the searchQuery
     Destination_searchQuery = destination_city; // Update the input value
@@ -192,47 +193,48 @@
       <h1>Travel Details</h1>
 
       <div class="search-container">
-        <!-- Destination Search -->
-        <input
-          type="text"
-          bind:value="{Destination_searchQuery}"
-          placeholder="{destination_city === '' ? 'Search destination cities...' : destination_city}"
-          on:focus="{() => showDestinationDropdown = true}"
-          on:blur="{() => setTimeout(() => showDestinationDropdown = false, 100)}" 
-        />
-      
-        {#if showDestinationDropdown && filteredDestinationCities.length > 0}
-          <ul class="dropdown">
-            {#each filteredDestinationCities as city}
-              <li 
-                on:click="{() => selectDestinationCity(city)}"
-              >
-                {city.city}, {city.country}
-              </li>
-            {/each}
-          </ul>
-        {/if}
-      
-        <!-- Departure Search -->
-        <input
-          type="text"
-          bind:value="{Departure_searchQuery}"
-          placeholder="{departure_city === '' ? 'Search departure cities...' : departure_city}"
-          on:focus="{() => showDepartureDropdown = true}"
-          on:blur="{() => setTimeout(() => showDepartureDropdown = false, 100)}" 
-        />
-      
-        {#if showDepartureDropdown && filteredDepartureCities.length > 0}
-          <ul class="dropdown">
-            {#each filteredDepartureCities as city}
-              <li 
-                on:click="{() => selectDepartureCity(city)}"
-              >
-                {city.city}, {city.country}
-              </li>
-            {/each}
-          </ul>
-        {/if}
+<!-- Destination Search -->
+<input
+  type="text"
+  bind:value="{Destination_searchQuery}"
+  placeholder="{destination_city === '' ? 'Search destination cities...' : destination_city}"
+  on:focus="{() => showDestinationDropdown = true}"
+  on:blur="{() => setTimeout(() => showDestinationDropdown = false, 200)}"
+/>
+
+{#if showDestinationDropdown && filteredDestinationCities.length > 0}
+  <ul class="dropdown">
+    {#each filteredDestinationCities as city}
+      <li
+        on:mousedown="{() => selectDestinationCity(city)}"
+      >
+        {city.city}, {city.country}
+      </li>
+    {/each}
+  </ul>
+{/if}
+
+<!-- Departure Search -->
+<input
+  type="text"
+  bind:value="{Departure_searchQuery}"
+  placeholder="{departure_city === '' ? 'Search departure cities...' : departure_city}"
+  on:focus="{() => showDepartureDropdown = true}"
+  on:blur="{() => setTimeout(() => showDepartureDropdown = false, 200)}"
+/>
+
+{#if showDepartureDropdown && filteredDepartureCities.length > 0}
+  <ul class="dropdown">
+    {#each filteredDepartureCities as city}
+      <li
+        on:mousedown="{() => selectDepartureCity(city)}"
+      >
+        {city.city}, {city.country}
+      </li>
+    {/each}
+  </ul>
+{/if}
+
       </div>
       
     
