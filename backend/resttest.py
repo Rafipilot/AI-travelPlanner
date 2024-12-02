@@ -1,33 +1,31 @@
-import requests
-from serpapi import GoogleSearch
-from dotenv import load_dotenv
-import os
+import smtplib
+from email.mime.text import MIMEText
+from email.mime.multipart import MIMEMultipart
 
-load_dotenv()
+# Email details
+sender_email = "rafayellatif19@gmail.com"
+receiver_email = "rafayel.latif@gmail.com"
+password = "ulfl vgfa vjvx znsp"  # Use an App Password if applicable
 
-ser_api_key = os.getenv("SER_API_KEY")
+# Create the email content
+subject = "Test Email from Python"
+body = "This is a test email sent from a Python script."
 
-def get_restaurants(lat, lng):
-    ll = f"@{lat}, {lng},15.1z"
-    params = {
-    "engine": "google_maps",
-    "q": "restaurants",
-    "ll": ll,
-    "type": "search",
-    "api_key": ser_api_key
-    }
+# Create the email message
+msg = MIMEMultipart()
+msg['From'] = sender_email
+msg['To'] = receiver_email
+msg['Subject'] = subject
+msg.attach(MIMEText(body, 'plain'))
 
-    search = GoogleSearch(params)
-    results = search.get_dict()
-    local_results = results["local_results"]
-
-    restaurants  = []
-    for res in local_results:
-        temp_array = [res['title'], res['website']]
-        restaurants.append(temp_array)
-
-    return restaurants
-
-res = get_restaurants(40.7455096,-74.0083012)
-
-print(res)
+try:
+    # Connect to the Gmail SMTP server
+    server = smtplib.SMTP('smtp.gmail.com', 587)
+    server.starttls()  # Upgrade to secure connection
+    server.login(sender_email, password)
+    server.sendmail(sender_email, receiver_email, msg.as_string())
+    print("Email sent successfully!")
+except Exception as e:
+    print(f"Error: {e}")
+finally:
+    server.quit()

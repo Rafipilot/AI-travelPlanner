@@ -26,6 +26,7 @@
   let filteredCities = [];
   let showDepartureDropdown = false;
   let showDestinationDropdown = false;
+  let user_email = "";
 
 
   fetch('/cities.json')
@@ -83,6 +84,11 @@
     number_of_people = event.target.value;
   }
 
+  function handleEmailChange(event) {
+    user_email = event.target.value;
+    console.log(user_email)
+  }
+
   function handleBudgetChange(event) {
     budget = event.target.value;
   }
@@ -107,11 +113,12 @@
       departure_date: departureDate,
       return_date: returnDate,
       budget: budget,
+      user_email: user_email,
     };
 
     isLoading = true;
     try {
-      const response = await fetch("https://my-svelte-project.onrender.com/api/second_step", {
+      const response = await fetch("http://127.0.0.1:5000/api/second_step", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(data),
@@ -149,7 +156,7 @@
 
     isLoading = true;
     try {
-      const response = await fetch("https://my-svelte-project.onrender.com/api/first_step", {
+      const response = await fetch("http://127.0.0.1:5000/api/first_step", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(travelData)
@@ -241,18 +248,21 @@
       </div>
       
 
-      <h4>Step 3: Number of People</h4>
-      <input type="number" placeholder="Number of People" bind:value="{number_of_people}" on:input="{handleNumberPeopleChange}" />
+  <h4>Step 3: Number of People</h4>
+  <input type="number" placeholder="Number of People" bind:value="{number_of_people}" on:input="{handleNumberPeopleChange}" />
 
-      <h4>Step 4: Budget</h4>
-      <input type="range" min="100" max="20000" bind:value="{budget}" on:input="{handleBudgetChange}" />
-      <span>{budget}$</span>
+  <h4>Step 4: Budget</h4>
+  <input type="range" min="100" max="20000" bind:value="{budget}" on:input="{handleBudgetChange}" />
+  <span>{budget}$</span>
 
-      <h4>Step 5: Travel Dates</h4>
-      <input type="date" bind:value="{departureDate}" on:input="{handleDepartureDateChange}" />
-      <input type="date" min="{departureDate}" bind:value="{returnDate}" on:input="{handleReturnDateChange}" />
+  <h4>Step 5: Travel Dates</h4>
+  <input type="date" bind:value="{departureDate}" on:input="{handleDepartureDateChange}" />
+  <input type="date" min="{departureDate}" bind:value="{returnDate}" on:input="{handleReturnDateChange}" />
 
-      <button on:click="{generate}">Ask your personalized travel agent</button>
+  <h4>Step 6: Optionally enter your email address so we can send a copy straight to your inbox</h4>
+  <input type="email" placeholder="youremail@example.com" bind:value="{user_email}" on:input="{handleEmailChange}"/>
+
+  <button on:click="{generate}">Ask your personalized travel agent</button>
 
   {/if}
 

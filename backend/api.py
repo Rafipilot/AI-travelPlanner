@@ -11,6 +11,9 @@ import re
 import random 
 from dotenv import load_dotenv
 import os
+import smtplib
+from email.mime.text import MIMEText
+from email.mime.multipart import MIMEMultipart
 
 load_dotenv()
 
@@ -565,6 +568,9 @@ def response():
     depart_date = data.get('departure_date')
     return_date = data.get('return_date')
     budget = data.get('budget')
+    user_email = data.get('user_email')
+
+
 
 
     weather = get_average_temp(destination, depart_date)
@@ -593,6 +599,29 @@ def response():
 
     ai_response = get_openai_response(number_of_people=number_of_people, departure=departure, destination=destination, duration=duration, flights=flights, weather_info=weather, best_hotels=hotels, activities=activities_array, restaurants=res, cost=cost, budget=budget, per_person_cost=per_person_cost)
     
+    sender_email = "rafayellatif19@gmail.com"
+    receiver_email = user_email
+    password = "ulfl vgfa vjvx znsp"  # Use an App Password if applicable
+    subject = "Your AI Generated Travel Plan"
+    msg = MIMEMultipart()
+    msg['From'] = sender_email
+    msg['To'] = receiver_email
+    msg['Subject'] = subject
+    msg.attach(MIMEText(ai_response, 'plain'))
+
+    try:
+        # Connect to the Gmail SMTP server
+        server = smtplib.SMTP('smtp.gmail.com', 587)
+        server.starttls()  # Upgrade to secure connection
+        server.login(sender_email, password)
+        server.sendmail(sender_email, receiver_email, msg.as_string())
+        print("Email sent successfully!")
+    except Exception as e:
+        print(f"Error: {e}")
+    finally:
+        server.quit()
+
+
     response = {
         "status": "success",
         "message": "response",
