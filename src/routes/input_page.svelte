@@ -194,6 +194,7 @@
 
       <div class="search-container">
 <!-- Destination Search -->
+<h4>Step 1: Enter your detination city</h4>
 <input
   type="text"
   bind:value="{Destination_searchQuery}"
@@ -215,6 +216,7 @@
 {/if}
 
 <!-- Departure Search -->
+<h4>Step 2: Enter your departure city</h4>
 <input
   type="text"
   bind:value="{Departure_searchQuery}"
@@ -235,9 +237,7 @@
   </ul>
 {/if}
 
-      </div>
-      
-    
+      </div>  
       </div>
       
 
