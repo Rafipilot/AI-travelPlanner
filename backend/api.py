@@ -23,7 +23,7 @@ am_auth = os.getenv("AM_AUTH")
 google_api_key = os.getenv("GOOGLE_API_KEY")
 ser_api_key = os.getenv("SER_API_KEY")
 openai_key = os.getenv("OPENAI_KEY")
-
+print(openai_key)
 
 
 
@@ -142,64 +142,31 @@ def get_restaurants(lat, lng):
 
     restaurants  = []
     for res in local_results:
-        temp_array = [res.get('title', 'No Title'), res.get('website', 'No Website')]
+        temp_array = [res.get('title', 'No Title'), res.get('website', 'No Website'), res.get('gps_coordinates')]
         restaurants.append(temp_array)
 
     return restaurants
 
-def get_activities(city_name, lat ,lng):
-
-
-    #Use the Places API to get nearby activities (tourist attractions)
-    places_url = 'https://maps.googleapis.com/maps/api/place/nearbysearch/json'
-    places_params = {
-        'location': f'{lat},{lng}',  # Lat, Lng coordinates
-        'radius': 5000,  # Search within a 5 km radius 
-        'type': 'tourist_attraction',  # Type of places to search for
-        'key': google_api_key  
+def get_activities(lat ,lng):
+    ll = f"@{lat}, {lng},15.1z"
+    params = {
+    "engine": "google_maps",
+    "q": "tourist attractions",
+    "ll": ll,
+    "type": "search",
+    "api_key": ser_api_key
     }
 
-    # Make the request to the Places API
-    places_response = requests.get(places_url, params=places_params)
+    search = GoogleSearch(params)
+    results = search.get_dict()
+    local_results = results["local_results"]
 
-    if places_response.status_code == 200:
-        places_data = places_response.json()
+    activities = []
+    for act in local_results:
+        temp_array = [act.get('title', 'No Title'), act.get('website', 'No Website'), act.get('gps_coordinates')]
+        activities.append(temp_array)
 
-        # Check if there are any results
-        if places_data['results']:
-            activities = []
-            for place in places_data['results']:
-                name = place.get('name')
-                address = place.get('vicinity')
-                place_id = place.get('place_id')
-
-
-                details_url = 'https://maps.googleapis.com/maps/api/place/details/json'
-                details_params = {
-                    'place_id': place_id,
-                    'key': google_api_key
-                }
-
-                # Make the request to the Place Details API
-                details_response = requests.get(details_url, params=details_params)
-                if details_response.status_code == 200:
-                    details_data = details_response.json()
-                    if details_data['status'] == 'OK':
-                        # Get the description from the Place Details API response
-                        description = details_data['result'].get('editorial_summary', {}).get('overview', 'No description available')
-                    else:
-                        description = 'No description available'
-                else:
-                    description = 'Error retrieving details'
-
-                # Append the activity details to the list
-                activities.append([name, address, description])
-
-            return activities
-        else:
-            print("No activities found near the city.")
-    else:
-        print("Error retrieving places:", places_response.status_code, places_response.text)
+    return activities
 
 
 
@@ -377,7 +344,7 @@ def get_openai_response(number_of_people, departure, destination, duration,fligh
 
     f"**Day-by-Day Itinerary:**\n"
     f"- Create a full detailed day-by-day itinerary based on the trip duration. Include suggested times for activities listed above, when yuou recommend restaurants, pick from the given ones. "
-    f"transportation tips, and meal recommendations.\n"
+    f"transportation tips, and meal recommendations. When you recommend a actvitity make sure the restaurant for lunch on that day location is close, rememeber, you are given the gps co-ordinates.\n"
     f"Include the days that the Traveller(s) arrive"
     f"- Balance the itinerary to avoid overwhelming the traveler, but also ensure that the trip is fulfilling and diverse.\n\n"
 
@@ -509,7 +476,7 @@ def flights_and_hotels():
     duration = (d2 - d1).days
 
 
-
+    print("getting coords for: ", destination)
     lat, lng = get_coords(destination)
 
     Cost = int(0)
@@ -591,7 +558,9 @@ def response():
 
 
     res = get_restaurants(lat, lng)
-    activities = get_activities(destination, lat, lng)
+
+
+    activities = get_activities(lat, lng)
     activities_array  = []
     for activity in activities:
         url = get_website((str(activity)+" tickets"))
