@@ -613,7 +613,7 @@ def response():
     
 
     sender_email = "rafayellatif19@gmail.com"
-    receiver_email = "rafayel.latif@gmail.com"
+    receiver_email = user_email
     password = "ulfl vgfa vjvx znsp"
 
 
