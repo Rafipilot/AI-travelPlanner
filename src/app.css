@@ -94,10 +94,11 @@ span {
 
 #start_button {
   margin-top: 2rem;
-  padding: 0.75rem 1.5rem;
+  display: flex;
+  justify-content: center;
   background-color: #4a90e2;
   color: white;
-  font-size: 1.25rem;
+  font-size: 1rem;
   border: none;
   border-radius: 8px;
   text-decoration: none;
@@ -240,3 +241,4 @@ input[type="text"] {
 .dropdown li:hover {
   background: #f0f0f0;
 }
+
