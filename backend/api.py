@@ -331,14 +331,13 @@ def get_openai_response(number_of_people, departure, destination, duration,fligh
     f"- Price (Per night):"
     f"- CLick here to book your stay at"
 
-    f"**Restaurant Options based on your hotel location:"
+    f"**Restaurant Options based on your hotel location, give {duration} amount of options:"
     f"{restaurants}"
     f"restaurant name"
     f"restaurant website"
 
     f"**Activities and Attractions:**\n"
-    f"- Based on the duration of the trip, suggest activities that are relevant to the destination. Maybe like 1-2 activites per day in a list format"
-    f"actvities list: {activities}\n"
+    f"- Based on the duration of the trip, suggest activities that are relevant to the destination.  give {duration} amount of options: {activities}\n"
     f"- Include brief descriptions of each activity and links to booking or more details if available.\n\n"
 
     f"**Day-by-Day Itinerary:**\n"
