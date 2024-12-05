@@ -60,12 +60,19 @@
 
 
 $: filteredDepartureCities = cities
-  .filter(city => city.city.toLowerCase().includes(Departure_searchQuery.toLowerCase()))
+  .filter(city => 
+    city.city.toLowerCase().includes(Departure_searchQuery.toLowerCase()) ||
+    city.country.toLowerCase().includes(Departure_searchQuery.toLowerCase())
+  )
   .slice(0, 50); // Show only the top 50 results
 
 
+
 $: filteredDestinationCities = cities
-  .filter(city => city.city.toLowerCase().includes(Destination_searchQuery.toLowerCase()))
+.filter(city => 
+    city.city.toLowerCase().includes(Destination_searchQuery.toLowerCase()) ||
+    city.country.toLowerCase().includes(Destination_searchQuery.toLowerCase())
+  )
   .slice(0, 50)
 
 
