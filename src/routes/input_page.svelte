@@ -3,8 +3,6 @@
 
   import { tick } from 'svelte';
 
-
-
   let destination_city = "";
   let departure_city = "";
   let number_of_people = 0;
