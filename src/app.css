@@ -99,6 +99,12 @@ span {
   margin: 30px 0;
 }
 
+#start_button {
+  pointer-events: auto;
+  z-index: 10;
+}
+
+
 #tab {
   display: flex;
   justify-content: center;

@@ -306,13 +306,10 @@ async function GPT_response() {
           <h4>Step 6: Optionally enter your email address so we can send a copy of your personalized travel plan straight to your inbox</h4>
           <input type="email" placeholder="youremail@example.com" bind:value="{user_email}" on:input="{handleEmailChange}"/>
         
-          <button
-            on:click="{generate}" 
-            on:touchstart="{() => generate()}" 
-            id="start_button"
-          >
+          <button on:click="{generate}" id="start_button" tabindex="0">
             Ask your personalized travel agent
           </button>
+          
   
           {/if}
 
