@@ -15,7 +15,6 @@
   let availableFlights = [];
   let availableHotels = [];
   let showGenerateButton = false;
-  let showAIResponse = false;
   let aiResponsePage = false;
   let flightPage = false;
   let input_page = true; 
@@ -23,11 +22,10 @@
   let cities = [];
   let Departure_searchQuery = "";
   let Destination_searchQuery = "";
-  let filteredCities = [];
   let showDepartureDropdown = false;
   let showDestinationDropdown = false;
   let user_email = "";
-  let flight_price = 0
+  let price_per_person_per_day = 50;
 
   fetch('/cities.json')
     .then(response => {
@@ -93,6 +91,10 @@
     budget = event.target.value;
   }
 
+  function handlePricePerPerson(event)  {
+    price_per_person_per_day = event.target.value;
+  }
+
   function handleDepartureDateChange(event) {
     departureDate = event.target.value;
   }
@@ -125,7 +127,8 @@
     number_of_people,
     budget_range: Number(budget),
     departure_date: departureDate,
-    return_date: returnDate
+    return_date: returnDate,
+    
   };
   if (!departure_city || !destination_city) {
     alert("Please fill in both the departure city and the destination city.");
@@ -134,7 +137,7 @@
 
   isLoading = true;
   try {
-    const response = await fetch("https://my-svelte-project.onrender.com/api/flights", {
+    const response = await fetch("http://127.0.0.1:5000/api/flights", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify(travelData)
@@ -167,6 +170,7 @@ async function generateHotel() {
     departure_date: departureDate,
     return_date: returnDate,
     flight_price: selectedFlight['price'],
+    price_per_person_per_day: price_per_person_per_day,
   };
 
   if (!selectedFlight) {
@@ -176,7 +180,7 @@ async function generateHotel() {
 
   isLoading = true;
   try {
-    const response = await fetch("https://my-svelte-project.onrender.com/api/hotels", {
+    const response = await fetch("http://127.0.0.1:5000/api/hotels", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify(hotelData)
@@ -212,11 +216,12 @@ async function GPT_response() {
     return_date: returnDate,
     budget: budget,
     user_email: user_email,
+    price_per_person_per_day: price_per_person_per_day,
   };
 
   isLoading = true;
   try {
-    const response = await fetch("https://my-svelte-project.onrender.com/api/second_step", {
+    const response = await fetch("http://127.0.0.1:5000/api/second_step", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify(data),
@@ -298,12 +303,16 @@ async function GPT_response() {
           <h4>Step 4: Budget</h4>
           <input type="range" min="100" max="20000" bind:value="{budget}" on:input="{handleBudgetChange}" />
           <span>{budget}$</span>
+
+          <h4>Step 5: Per Person Daily Extras (Meals, Taxis, Activities, etc)</h4>
+          <input type="range" min="20" max="200" bind:value="{price_per_person_per_day}" on:input="{handlePricePerPerson}" />
+          <span>{price_per_person_per_day}$</span>
         
-          <h4>Step 5: Travel Dates</h4>
+          <h4>Step 6: Travel Dates</h4>
           <input type="date" bind:value="{departureDate}" on:input="{handleDepartureDateChange}" />
           <input type="date" min="{departureDate}" bind:value="{returnDate}" on:input="{handleReturnDateChange}" />
         
-          <h4>Step 6: Optionally enter your email address so we can send a copy of your personalized travel plan straight to your inbox</h4>
+          <h4>Step 7: Optionally enter your email address so we can send a copy of your personalized travel plan straight to your inbox</h4>
           <input type="email" placeholder="youremail@example.com" bind:value="{user_email}" on:input="{handleEmailChange}"/>
         
           <button on:click="{generate}" id="start_button">Ask your personalized travel agent</button>
@@ -315,7 +324,7 @@ async function GPT_response() {
       <div id="mainPage">
         <h1>Choose Your Flight</h1>
 
-        <h4>Step 6: Select a Flight</h4>
+        <h4>Select a Flight</h4>
         <select on:change="{handleFlightSelection}">
           <option value="">-- Select a Flight --</option>
           {#each availableFlights as flight, index}

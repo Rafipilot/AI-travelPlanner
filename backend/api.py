@@ -423,6 +423,7 @@ def hotels():
     depart_date = data.get('departure_date')
     return_date = data.get('return_date')
     flight_price = data.get('flight_price')
+    price_per_person_per_day = int(data.get('price_per_person_per_day'))
 
     d1 = datetime.strptime(str(depart_date), "%Y-%m-%d")
     d2 = datetime.strptime(str(return_date), "%Y-%m-%d")
@@ -430,8 +431,7 @@ def hotels():
 
     print("getting coords for: ", destination)
     lat, lng = get_coords(destination)
-    per_night_budget = (int(budget - int(flight_price))) - (100 * int(duration) * int(number_of_people))
-    min_price = per_night_budget - 100 * duration
+    per_night_budget = (int(budget - int(flight_price))) - (price_per_person_per_day * int(duration) * int(number_of_people))
     hotels = get_hotel_data(destination, lat, lng, str(depart_date), str(return_date), number_people=number_of_people)
 
     best_hotels = []
@@ -466,6 +466,97 @@ def hotels():
     return jsonify(response)
 
 
+@app.route('/api/second_step', methods=['POST'])
+def response():
+    data = request.get_json()
+    flights = data.get('selectedFlight')
+    hotels = data.get('selectedHotel')
+    departure = data.get('departure_city')
+    destination = data.get('destination_city')
+    number_of_people = data.get('number_of_people')
+    depart_date = data.get('departure_date')
+    return_date = data.get('return_date')
+    budget = data.get('budget')
+    user_email = data.get('user_email')
+    price_per_person_per_day = int(data.get('price_per_person_per_day'))
+
+
+
+
+    weather = get_average_temp(destination, depart_date)
+    lat= hotels[3]['latitude']
+    lng = hotels[3] ['longitude']
+
+
+    res = get_restaurants(lat, lng)
+
+
+    activities = get_activities(lat, lng)
+    activities_array  = []
+    for activity in activities:
+        url = get_website((str(activity)+" tickets"))
+        activities_array.append([activity, url])
+
+
+
+    d1 = datetime.strptime(str(depart_date), "%Y-%m-%d")
+    d2 = datetime.strptime(str(return_date), "%Y-%m-%d")
+    duration = (d2 - d1).days
+
+    cost = 0  
+    per_person_cost = int(number_of_people)*price_per_person_per_day*int(duration)
+    print(number_of_people, duration)
+    print("per person",per_person_cost)
+    cost = cost + int(hotels[1]*int(duration)) + int(flights['price']) + int(per_person_cost)
+
+    ai_response = get_openai_response(number_of_people=number_of_people, departure=departure, destination=destination, duration=duration, flights=flights, weather_info=weather, best_hotels=hotels, activities=activities_array, restaurants=res, cost=cost, budget=budget, per_person_cost=per_person_cost)
+    
+
+    sender_email = "rafayellatif19@gmail.com"
+    receiver_email = user_email
+    password = "ulfl vgfa vjvx znsp"
+
+
+    processed_ai_response = preprocess_markdown(ai_response)
+
+    # Convert Markdown to HTML
+    html_content = markdown2.markdown(processed_ai_response)
+
+    # Email setup
+    msg = MIMEMultipart("alternative")
+    msg['From'] = sender_email
+    msg['To'] = receiver_email
+    msg['Subject'] = "AI Travel Plan!"
+
+    # Attach both plain text and HTML versions
+    msg.attach(MIMEText(processed_ai_response, "plain"))  # Plain text version
+    msg.attach(MIMEText(html_content, "html"))  # HTML version
+
+    # Send the email
+    try:
+        server = smtplib.SMTP('smtp.gmail.com', 587)
+        server.starttls()
+        server.login(sender_email, password)
+        server.sendmail(sender_email, receiver_email, msg.as_string())
+        print("Markdown email sent successfully!")
+    except Exception as e:
+        print(f"Failed to send email: {e}")
+    finally:
+        server.quit()
+
+
+    response = {
+        "status": "success",
+        "message": "response",
+        "details": {
+            "response": ai_response,
+        }
+    }
+    return jsonify(response)
+
+
+if __name__ == '__main__':
+    app.run(debug=True)
 
 
 @app.route('/api/first_step', methods=['POST'])
@@ -542,94 +633,3 @@ def flights_and_hotels():
         }
     }
     return jsonify(response)
-
-@app.route('/api/second_step', methods=['POST'])
-def response():
-    data = request.get_json()
-    flights = data.get('selectedFlight')
-    hotels = data.get('selectedHotel')
-    departure = data.get('departure_city')
-    destination = data.get('destination_city')
-    number_of_people = data.get('number_of_people')
-    depart_date = data.get('departure_date')
-    return_date = data.get('return_date')
-    budget = data.get('budget')
-    user_email = data.get('user_email')
-
-
-
-
-    weather = get_average_temp(destination, depart_date)
-    lat= hotels[3]['latitude']
-    lng = hotels[3] ['longitude']
-
-
-    res = get_restaurants(lat, lng)
-
-
-    activities = get_activities(lat, lng)
-    activities_array  = []
-    for activity in activities:
-        url = get_website((str(activity)+" tickets"))
-        activities_array.append([activity, url])
-
-
-
-    d1 = datetime.strptime(str(depart_date), "%Y-%m-%d")
-    d2 = datetime.strptime(str(return_date), "%Y-%m-%d")
-    duration = (d2 - d1).days
-
-    cost = 0  
-    per_person_cost = int(number_of_people)*50*int(duration)
-    print(number_of_people, duration)
-    print("per person",per_person_cost)
-    cost = cost + int(hotels[1]*int(duration)) + int(flights['price']) + int(per_person_cost)
-
-    ai_response = get_openai_response(number_of_people=number_of_people, departure=departure, destination=destination, duration=duration, flights=flights, weather_info=weather, best_hotels=hotels, activities=activities_array, restaurants=res, cost=cost, budget=budget, per_person_cost=per_person_cost)
-    
-
-    sender_email = "rafayellatif19@gmail.com"
-    receiver_email = user_email
-    password = "ulfl vgfa vjvx znsp"
-
-
-    processed_ai_response = preprocess_markdown(ai_response)
-
-    # Convert Markdown to HTML
-    html_content = markdown2.markdown(processed_ai_response)
-
-    # Email setup
-    msg = MIMEMultipart("alternative")
-    msg['From'] = sender_email
-    msg['To'] = receiver_email
-    msg['Subject'] = "AI Travel Plan!"
-
-    # Attach both plain text and HTML versions
-    msg.attach(MIMEText(processed_ai_response, "plain"))  # Plain text version
-    msg.attach(MIMEText(html_content, "html"))  # HTML version
-
-    # Send the email
-    try:
-        server = smtplib.SMTP('smtp.gmail.com', 587)
-        server.starttls()
-        server.login(sender_email, password)
-        server.sendmail(sender_email, receiver_email, msg.as_string())
-        print("Markdown email sent successfully!")
-    except Exception as e:
-        print(f"Failed to send email: {e}")
-    finally:
-        server.quit()
-
-
-    response = {
-        "status": "success",
-        "message": "response",
-        "details": {
-            "response": ai_response,
-        }
-    }
-    return jsonify(response)
-
-
-if __name__ == '__main__':
-    app.run(debug=True)
