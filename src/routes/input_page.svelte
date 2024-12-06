@@ -246,72 +246,77 @@ async function GPT_response() {
       <h1>Travel Details</h1>
 
       <div class="search-container">
-        <h4>Step 1: Enter your departure city</h4>
-        <input
-          type="text"
-          bind:value="{Departure_searchQuery}"
-          placeholder="{departure_city === '' ? 'Search departure cities...' : departure_city}"
-          on:focus="{() => showDepartureDropdown = true}"
-          on:blur="{() => setTimeout(() => showDepartureDropdown = false, 200)}"
-        />
+
         
-        {#if showDepartureDropdown && filteredDepartureCities.length > 0}
-          <ul class="dropdown">
-            {#each filteredDepartureCities as city}
-              <li
-                on:mousedown="{() => selectDepartureCity(city)}"
-              >
-                {city.city}, {city.country}
-              </li>
-            {/each}
-          </ul>
-        {/if}
-        <!-- Destination Search -->
-        <h4>Step 2: Enter your detination city</h4>
-        <input
-          type="text"
-          bind:value="{Destination_searchQuery}"
-          placeholder="{destination_city === '' ? 'Search destination cities...' : destination_city}"
-          on:focus="{() => showDestinationDropdown = true}"
-          on:blur="{() => setTimeout(() => showDestinationDropdown = false, 200)}"
-        />
-        
-        {#if showDestinationDropdown && filteredDestinationCities.length > 0}
-          <ul class="dropdown">
-            {#each filteredDestinationCities as city}
-              <li
-                on:mousedown="{() => selectDestinationCity(city)}"
-              >
-                {city.city}, {city.country}
-              </li>
-            {/each}
-          </ul>
-        {/if}
-        
-              </div>  
-            </div>
-              
-        
-          <h4>Step 3: Number of People</h4>
-          <input type="number" placeholder="Number of People" bind:value="{number_of_people}" on:input="{handleNumberPeopleChange}" />
-        
-          <h4>Step 4: Budget</h4>
-          <input type="range" min="100" max="20000" bind:value="{budget}" on:input="{handleBudgetChange}" />
-          <span>{budget}$</span>
-        
-          <h4>Step 5: Travel Dates</h4>
-          <input type="date" bind:value="{departureDate}" on:input="{handleDepartureDateChange}" />
-          <input type="date" min="{departureDate}" bind:value="{returnDate}" on:input="{handleReturnDateChange}" />
-        
-          <h4>Step 6: Optionally enter your email address so we can send a copy of your personalized travel plan straight to your inbox</h4>
-          <input type="email" placeholder="youremail@example.com" bind:value="{user_email}" on:input="{handleEmailChange}"/>
-        
-          <button on:click="{generate}" id="start_button" tabindex="0">
-            Ask your personalized travel agent
-          </button>
-          
-  
-          {/if}
+<!-- Departure Search -->
+<h4>Step 1: Enter your departure city</h4>
+<input
+  type="text"
+  bind:value="{Departure_searchQuery}"
+  placeholder="{departure_city === '' ? 'Search departure cities...' : departure_city}"
+  on:focus="{() => showDepartureDropdown = true}"
+  on:blur="{() => setTimeout(() => showDepartureDropdown = false, 200)}"
+/>
+
+{#if showDepartureDropdown && filteredDepartureCities.length > 0}
+  <ul class="dropdown">
+    {#each filteredDepartureCities as city}
+      <li
+        on:mousedown="{() => selectDepartureCity(city)}"
+      >
+        {city.city}, {city.country}
+      </li>
+    {/each}
+  </ul>
+{/if}
+<!-- Destination Search -->
+<h4>Step 2: Enter your detination city</h4>
+<input
+  type="text"
+  bind:value="{Destination_searchQuery}"
+  placeholder="{destination_city === '' ? 'Search destination cities...' : destination_city}"
+  on:focus="{() => showDestinationDropdown = true}"
+  on:blur="{() => setTimeout(() => showDestinationDropdown = false, 200)}"
+/>
+
+{#if showDestinationDropdown && filteredDestinationCities.length > 0}
+  <ul class="dropdown">
+    {#each filteredDestinationCities as city}
+      <li
+        on:mousedown="{() => selectDestinationCity(city)}"
+      >
+        {city.city}, {city.country}
+      </li>
+    {/each}
+  </ul>
+{/if}
+
+      </div>  
+      </div>
+      
+
+  <h4>Step 3: Number of People</h4>
+  <input type="number" placeholder="Number of People" bind:value="{number_of_people}" on:input="{handleNumberPeopleChange}" />
+
+  <h4>Step 4: Budget</h4>
+  <input type="range" min="100" max="20000" bind:value="{budget}" on:input="{handleBudgetChange}" />
+  <span>{budget}$</span>
+
+  <h4>Step 5: Travel Dates</h4>
+  <input type="date" bind:value="{departureDate}" on:input="{handleDepartureDateChange}" />
+  <input type="date" min="{departureDate}" bind:value="{returnDate}" on:input="{handleReturnDateChange}" />
+
+  <h4>Step 6: Optionally enter your email address so we can send a copy of your personalized travel plan straight to your inbox</h4>
+  <input type="email" placeholder="youremail@example.com" bind:value="{user_email}" on:input="{handleEmailChange}"/>
+
+  <button on:click="{generate}" id="start_button">Ask your personalized travel agent</button>
+
+  {/if}
+
+  {#if isLoading}
+    <div class="spinner"></div>
+    <p id="loading_text">Loading, this could take up to 3 minutes</p>
+  {/if}
 
 
     {#if flightPage && !isLoading}
@@ -359,8 +364,5 @@ async function GPT_response() {
     </div>
   {/if}
 
-  {#if isLoading}
-    <div class="spinner"></div>
-    <p id="loading_text">Loading, this could take up to 3 minutes</p>
-  {/if}
+
 </main>
