@@ -368,8 +368,6 @@ def get_openai_response(number_of_people, departure, destination, duration,fligh
         temperature=0.7,
         )
         travel_plan = response.choices[0].message.content
-        print("success")
-        print(travel_plan)
         return travel_plan
     
     except Exception as e:
@@ -431,13 +429,17 @@ def hotels():
 
     print("getting coords for: ", destination)
     lat, lng = get_coords(destination)
-    per_night_budget = (int(budget - int(flight_price))) - (price_per_person_per_day * int(duration) * int(number_of_people))
+    total_extra_cost = int(price_per_person_per_day)*int(duration)*int(number_of_people)
+    print("total extra: ", total_extra_cost, "flight: ", flight_price)
+    per_night_budget = ((int(budget - int(flight_price))) - (total_extra_cost))/int(duration)
     hotels = get_hotel_data(destination, lat, lng, str(depart_date), str(return_date), number_people=number_of_people)
+    print("hotels: ", hotels)
 
     best_hotels = []
     min_price_diffs = []
     hotel_info = ""  # Initialize the variable before appending to it
-    
+    print("total extra: ", total_extra_cost, "flight: ", flight_price)
+    print("per night budget: ", per_night_budget)
     # Find the four hotels with prices closest to the budget
     for hotel in hotels:
         if hotel['price'] == 0:
@@ -505,8 +507,6 @@ def response():
 
     cost = 0  
     per_person_cost = int(number_of_people)*price_per_person_per_day*int(duration)
-    print(number_of_people, duration)
-    print("per person",per_person_cost)
     cost = cost + int(hotels[1]*int(duration)) + int(flights['price']) + int(per_person_cost)
 
     ai_response = get_openai_response(number_of_people=number_of_people, departure=departure, destination=destination, duration=duration, flights=flights, weather_info=weather, best_hotels=hotels, activities=activities_array, restaurants=res, cost=cost, budget=budget, per_person_cost=per_person_cost)
