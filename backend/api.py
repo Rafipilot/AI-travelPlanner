@@ -376,9 +376,8 @@ def get_openai_response(number_of_people, departure, destination, duration,fligh
         print("Api error with openai : ", e)
         return "Error with Openai Gpt-3"
 
-#route definitions
-@app.route('/api/travel', methods=['POST'])
-def travel_agent():
+@app.route('/api/flights', methods=['POST'])
+def flights():
     data = request.get_json()
     departure = data.get('departure_city')
     destination = data.get('destination_city')
@@ -386,78 +385,88 @@ def travel_agent():
     budget = data.get('budget_range')
     depart_date = data.get('departure_date')
     return_date = data.get('return_date')
+    
+    d1 = datetime.strptime(str(depart_date), "%Y-%m-%d")
+    d2 = datetime.strptime(str(return_date), "%Y-%m-%d")
+    duration = (d2 - d1).days
 
-    print(departure, destination)
+    departure_id = get_freebase_id(departure)
+    destination_id = get_freebase_id(destination)
+
+    flights = get_flight_price(departure_id, destination_id, str(depart_date), str(return_date), adults=number_of_people)
+    try:
+        flights_prices = []
+        for flight in flights:
+            flights_prices.append(flight["price"])
+        average_price = sum(flights_prices)/len(flights_prices)
+    except Exception as e:
+        print("Could not find any flight options", e)
+        average_price = 0
+    print(average_price)
+
+    response = {
+        "status": "success",
+        "message": "Travel details received",
+        "details": {
+            "flights": flights,
+        }
+    }
+    return jsonify(response)
+
+
+@app.route('/api/hotels', methods=['POST'])
+def hotels():
+    data = request.get_json()
+    destination = data.get('destination_city')
+    number_of_people = data.get('number_of_people')
+    budget = data.get('budget_range')
+    depart_date = data.get('departure_date')
+    return_date = data.get('return_date')
+    flight_price = data.get('flight_price')
 
     d1 = datetime.strptime(str(depart_date), "%Y-%m-%d")
     d2 = datetime.strptime(str(return_date), "%Y-%m-%d")
     duration = (d2 - d1).days
 
-
-    print(depart_date, return_date)
+    print("getting coords for: ", destination)
     lat, lng = get_coords(destination)
-    activities = get_activities(destination, lat, lng)
-    random.shuffle(activities)
-    activities_to_return = []
-    for i in range(duration):
-        activities_to_return.append(activities[i])
+    per_night_budget = (int(budget - int(flight_price))) - (100 * int(duration) * int(number_of_people))
+    min_price = per_night_budget - 100 * duration
+    hotels = get_hotel_data(destination, lat, lng, str(depart_date), str(return_date), number_people=number_of_people)
 
-    Cost = int(0)
-    # Calculate duration and validate dates
-
-    weather_info = get_average_temp(destination, depart_date)
-
-    
-    hotels = get_hotel_data(destination, lat, lng, str(depart_date), str(return_date),number_people=number_of_people )
-
-    departure_id = get_freebase_id(departure)
-    destination_id = get_freebase_id(destination)
-    
-    flights = get_flight_price(departure_id, destination_id, str(depart_date), str(return_date), adults=number_of_people)
-
-    flights_prices = []
-    for flight in flights:
-        flights_prices.append(flight["price"])
-    average_price = sum(flights_prices)/len(flights_prices)
-    print(average_price)
-
-    Cost = Cost + average_price
-    hotel_info = ""
-    per_night_budget = (int(budget - int(average_price))) - 100 * duration
-    # Initialize variables
-    
     best_hotels = []
     min_price_diffs = []
-
+    hotel_info = ""  # Initialize the variable before appending to it
+    
     # Find the four hotels with prices closest to the budget
     for hotel in hotels:
+        if hotel['price'] == 0:
+            continue
         hotel_info += f"- **{hotel['name']}**\n"
         hotel_info += f"  - Price: {hotel['price'] * (duration - 1)}\n"
         hotel_info += f"  - [Click here to book]({hotel['url']})\n"
 
         price = int(float(hotel['price']))
         price_diff = abs(per_night_budget - price)
-        
+
         # Add each hotel to the list with its price difference
         min_price_diffs.append((hotel, price_diff))
 
-        # Sort by price difference and select the top 4
-        min_price_diffs = sorted(min_price_diffs, key=lambda x: x[1])[:4]
-        best_hotels = [[hotel['name'], hotel['price'], hotel['url']] for hotel, diff in min_price_diffs]
-
-    openai_response = get_openai_response(budget, depart_date, return_date, number_of_people, departure, destination, duration, flights=flights, flight_price=average_price, weather_info=weather_info, best_hotels=best_hotels, activities=activities, Cost=Cost, city_destination=destination)
-
+    # Sort by price difference and select the top 4
+    min_price_diffs = sorted(min_price_diffs, key=lambda x: x[1])[:4]
+    best_hotels = [[hotel['name'], hotel['price'], hotel['url'], hotel['coords']] for hotel, diff in min_price_diffs]
+    print(best_hotels)
     response = {
         "status": "success",
         "message": "Travel details received",
         "details": {
-            "openai_response": openai_response,
-            "flights": flights,
             "best_hotels": best_hotels,
-            "activities": activities_to_return,
         }
     }
     return jsonify(response)
+
+
+
 
 @app.route('/api/first_step', methods=['POST'])
 def flights_and_hotels():
