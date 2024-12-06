@@ -241,7 +241,7 @@ async function GPT_response() {
 </script>
 
 <main>
-  {#if input_page && !isLoading}
+  {#if input_page}
     <div id="mainPage">
       <h1>Travel Details</h1>
 
