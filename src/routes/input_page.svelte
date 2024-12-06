@@ -300,7 +300,7 @@ async function GPT_response() {
           <h4>Step 3: Number of People</h4>
           <input type="number" placeholder="Number of People" bind:value="{number_of_people}" on:input="{handleNumberPeopleChange}" />
         
-          <h4>Step 4: Budget</h4>
+          <h4>Step 4: Budget (Flights, Hotels, Per Person Daily Extras)</h4>
           <input type="range" min="100" max="20000" bind:value="{budget}" on:input="{handleBudgetChange}" />
           <span>{budget}$</span>
 
