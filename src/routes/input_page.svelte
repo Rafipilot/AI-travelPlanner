@@ -97,10 +97,21 @@
 
   function handleDepartureDateChange(event) {
     departureDate = event.target.value;
+
+    // If return date is before departure date, reset it
+    if (returnDate && new Date(returnDate) < new Date(departureDate)) {
+      returnDate = '';
+    }
   }
 
   function handleReturnDateChange(event) {
     returnDate = event.target.value;
+
+    // Ensure return date is after or equal to the departure date
+    if (new Date(returnDate) < new Date(departureDate)) {
+      alert('Return date cannot be earlier than departure date.');
+      returnDate = '';
+    }
   }
 
 
