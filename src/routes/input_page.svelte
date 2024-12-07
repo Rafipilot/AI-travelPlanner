@@ -60,22 +60,30 @@
   });
 
   onMount(() => {
-    departureDatePicker = flatpickr("#departure-date", {
-      onChange: (selectedDates) => {
-        departureDate = selectedDates[0].toISOString().split('T')[0];
-
+  departureDatePicker = flatpickr("#departure-date", {
+    onChange: (selectedDates) => {
+      if (selectedDates.length > 0) {
+        const date = selectedDates[0];
+        departureDate = `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}-${String(date.getDate()).padStart(2, '0')}`;
+        
         if (returnDatePicker) {
-          returnDatePicker.set('minDate', departureDate);
+          returnDatePicker.set('minDate', date); // Ensure return date cannot be before departure date
         }
       }
-    });
-
-    returnDatePicker = flatpickr("#return-date", {
-      onChange: (selectedDates) => {
-        returnDate = selectedDates[0].toISOString().split('T')[0];
-      }
-    });
+    }
   });
+
+  returnDatePicker = flatpickr("#return-date", {
+    onChange: (selectedDates) => {
+      if (selectedDates.length > 0) {
+        const date = selectedDates[0];
+        returnDate = `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}-${String(date.getDate()).padStart(2, '0')}`;
+      }
+    }
+  });
+});
+
+
 
   const selectDestinationCity = async (city) => {
     console.log("dest: ", city);
