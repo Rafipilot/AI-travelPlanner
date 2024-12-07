@@ -274,7 +274,7 @@ async function sendEmail() {
     user_email: user_email,
     message: apiResponse
   };
-  const response = await fetch("http://127.0.0.1:5000/api/send_email", {
+  const response = await fetch("https://my-svelte-project.onrender.com/api/send_email", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify(data),
