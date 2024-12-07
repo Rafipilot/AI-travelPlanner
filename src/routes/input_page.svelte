@@ -34,6 +34,8 @@
   let user_email = "";
   let price_per_person_per_day = 50;
 
+  let confirmHotelButton;
+
   fetch('/cities.json')
     .then(response => {
       console.log(response); 
@@ -132,7 +134,15 @@
     selectedHotel = availableHotels[selectedHotelIndex];
     console.log("Selected hotel:", selectedHotel);
     showGenerateButton = selectedFlight && selectedHotel;
+
+    // Scroll to the confirm button
+    tick().then(() => {
+      if (confirmHotelButton) {
+        confirmHotelButton.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      }
+    });
   }
+
 
 
   async function generate() {
@@ -378,9 +388,10 @@ async function GPT_response() {
             </li>
           {/each}
         </ul>
-        <button id="start_button" on:click={GPT_response}>
+        <button id="start_button" bind:this={confirmHotelButton} on:click={GPT_response}>
           {selectedHotel ? `Confirm ${selectedHotel[0]}` : 'Confirm Selection'}
         </button>
+        
       {:else}
         <p>No hotels available. Please try again later.</p>
       {/if}
