@@ -1,13 +1,20 @@
 <script>
   import { onMount } from 'svelte';
   import { tick } from 'svelte';
+  import flatpickr from 'flatpickr';
+  import 'flatpickr/dist/flatpickr.css';
 
   let destination_city = "";
   let departure_city = "";
   let number_of_people = 0;
   let budget = 10000;
+
   let departureDate = "";
   let returnDate = "";
+
+  let departureDatePicker;
+  let returnDatePicker;
+
   let isLoading = false;
   let apiResponse = null;
   let selectedFlight = null;
@@ -48,6 +55,25 @@
       console.log('md-block script loaded');
     };
     document.head.appendChild(script);
+  });
+
+  onMount(() => {
+    departureDatePicker = flatpickr("#departure-date", {
+      onChange: (selectedDates) => {
+        departureDate = selectedDates[0].toISOString().split('T')[0];
+
+        // Update the return date's minimum value
+        if (returnDatePicker) {
+          returnDatePicker.set('minDate', departureDate);
+        }
+      }
+    });
+
+    returnDatePicker = flatpickr("#return-date", {
+      onChange: (selectedDates) => {
+        returnDate = selectedDates[0].toISOString().split('T')[0];
+      }
+    });
   });
 
   const selectDestinationCity = async (city) => {
@@ -320,8 +346,8 @@ async function GPT_response() {
           <span>{price_per_person_per_day}$</span>
         
           <h4>Step 6: Travel Dates</h4>
-          <input type="date" bind:value="{departureDate}" on:input="{handleDepartureDateChange}" />
-          <input type="date" min="{departureDate}" bind:value="{returnDate}" on:input="{handleReturnDateChange}" />
+          <input id="departure-date" type="text" value="{departureDate}" />
+          <input id="return-date" type="text" value="{returnDate}" />
         
           <h4>Step 7: Optionally enter your email address so we can send a copy of your personalized travel plan straight to your inbox</h4>
           <input type="email" placeholder="youremail@example.com" bind:value="{user_email}" on:input="{handleEmailChange}"/>
