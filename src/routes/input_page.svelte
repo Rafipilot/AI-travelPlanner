@@ -36,11 +36,11 @@
 
   fetch('/cities.json')
     .then(response => {
-      console.log(response); // Log the response to inspect it
+      console.log(response); 
       return response.json();
     })
     .then(data => {
-      console.log(data); // Log the parsed data to check the structure
+      console.log(data); 
       cities = data;
     })
     .catch(error => {
@@ -62,7 +62,6 @@
       onChange: (selectedDates) => {
         departureDate = selectedDates[0].toISOString().split('T')[0];
 
-        // Update the return date's minimum value
         if (returnDatePicker) {
           returnDatePicker.set('minDate', departureDate);
         }
@@ -79,14 +78,14 @@
   const selectDestinationCity = async (city) => {
     console.log("dest: ", city);
     destination_city = `${city.city}`;
-    await tick(); // Ensure DOM is updated before changing the searchQuery
-    Destination_searchQuery = destination_city; // Update the input value
+    await tick(); 
+    Destination_searchQuery = destination_city; 
   };
 
   const selectDepartureCity = async (city) => {
     departure_city = `${city.city}`;
-    await tick(); // Ensure DOM is updated before changing the searchQuery
-    Departure_searchQuery = departure_city; // Update the input value
+    await tick();
+    Departure_searchQuery = departure_city; 
   };
 
   $: filteredDepartureCities = cities
@@ -120,26 +119,6 @@
   function handlePricePerPerson(event)  {
     price_per_person_per_day = event.target.value;
   }
-
-  function handleDepartureDateChange(event) {
-    departureDate = event.target.value;
-
-    // If return date is before departure date, reset it
-    if (returnDate && new Date(returnDate) < new Date(departureDate)) {
-      returnDate = '';
-    }
-  }
-
-  function handleReturnDateChange(event) {
-    returnDate = event.target.value;
-
-    // Ensure return date is after or equal to the departure date
-    if (new Date(returnDate) < new Date(departureDate)) {
-      alert('Return date cannot be earlier than departure date.');
-      returnDate = '';
-    }
-  }
-
 
 
   function handleFlightSelection(event) {
@@ -375,7 +354,7 @@ async function GPT_response() {
           {/each}
         </select>
 
-        <button on:click="{generateHotel}" disabled="{isLoading}">Generate Hotels</button>
+        <button on:click="{generateHotel}" disabled="{isLoading}" id = "start_button">Generate Hotels</button>
       </div>
     {/if}
 
@@ -423,6 +402,6 @@ async function GPT_response() {
 
   {#if isLoading}
     <div class="spinner"></div>
-    <p id="loading_text">Loading, this could take up to 3 minutes</p>
+    <p id="loading_text">Loading, this could take 1-2 minutes</p>
   {/if}
 </main>
