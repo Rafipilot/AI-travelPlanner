@@ -306,6 +306,7 @@ def get_openai_response(number_of_people, departure, destination, duration,fligh
     f"You are an expert travel planner. Based on the details provided below, create a structured, "
     f"personalized, and informative travel plan. The plan should be balanced, staying within the given "
     f"budget and trip duration. Please follow the guidelines for each section:\n\n"
+    f"It is vital that your put links where shown for flight, hotel restaurant and activity info."
 
     f"Travel plan for departure to destination city"
 
