@@ -562,81 +562,59 @@ def response():
     return jsonify(response)
 
 
-if __name__ == '__main__':
-    app.run(debug=True)
 
 
-@app.route('/api/first_step', methods=['POST'])
-def flights_and_hotels():
+
+@app.route('/api/send_email', methods=['POST'])
+def send_email():
     data = request.get_json()
-    departure = data.get('departure_city')
-    destination = data.get('destination_city')
-    number_of_people = data.get('number_of_people')
-    budget = data.get('budget_range')
-    depart_date = data.get('departure_date')
-    return_date = data.get('return_date')
-    
-    d1 = datetime.strptime(str(depart_date), "%Y-%m-%d")
-    d2 = datetime.strptime(str(return_date), "%Y-%m-%d")
-    duration = (d2 - d1).days
+    user_email = data.get('user_email')
+    message = data.get('message').get('response')
 
 
-    print("getting coords for: ", destination)
-    lat, lng = get_coords(destination)
+    sender_email = "rafayellatif19@gmail.com"
+    receiver_email = user_email
+    password = "ulfl vgfa vjvx znsp"
 
-    Cost = int(0)
-    
-    hotels = get_hotel_data(destination, lat, lng, str(depart_date), str(return_date),number_people=number_of_people )
+    print(message)
+    processed_ai_response = preprocess_markdown(message)
 
-    departure_id = get_freebase_id(departure)
-    destination_id = get_freebase_id(destination)
+    # Convert Markdown to HTML
+    html_content = markdown2.markdown(processed_ai_response)
 
-    flights = get_flight_price(departure_id, destination_id, str(depart_date), str(return_date), adults=number_of_people)
+    # Email setup
+    msg = MIMEMultipart("alternative")
+    msg['From'] = sender_email
+    msg['To'] = receiver_email
+    msg['Subject'] = "AI Travel Plan!"
+
+    # Attach both plain text and HTML versions
+    msg.attach(MIMEText(processed_ai_response, "plain"))  # Plain text version
+    msg.attach(MIMEText(html_content, "html"))  # HTML version
+
+    # Send the email
     try:
-        flights_prices = []
-        for flight in flights:
-            flights_prices.append(flight["price"])
-        average_price = sum(flights_prices)/len(flights_prices)
+        server = smtplib.SMTP('smtp.gmail.com', 587)
+        server.starttls()
+        server.login(sender_email, password)
+        server.sendmail(sender_email, receiver_email, msg.as_string())
+        print("Markdown email sent successfully!")
     except Exception as e:
-        print("Could not find any flight options", e)
-        average_price = 0
-    print(average_price)
-
-    Cost = Cost + average_price
-    hotel_info = ""
-    per_night_budget = (int(budget - int(average_price))) - (100*int(duration)*int(number_of_people))
-    print(per_night_budget)
-    # Initialize variables
-    
-    best_hotels = []
-    min_price_diffs = []
-
-    # Find the four hotels with prices closest to the budget
-    for hotel in hotels:
-        if hotel['price'] == 0:
-            continue
-        hotel_info += f"- **{hotel['name']}**\n"
-        hotel_info += f"  - Price: {hotel['price'] * (duration - 1)}\n"
-        hotel_info += f"  - [Click here to book]({hotel['url']})\n"
+        print(f"Failed to send email: {e}")
+    finally:
+        server.quit()
 
 
-
-        price = int(float(hotel['price']))
-        price_diff = abs(per_night_budget - price)
-        
-        # Add each hotel to the list with its price difference
-        min_price_diffs.append((hotel, price_diff))
-
-        # Sort by price difference and select the top 4
-        min_price_diffs = sorted(min_price_diffs, key=lambda x: x[1])[:4]
-        best_hotels = [[hotel['name'], hotel['price'], hotel['url'], hotel['coords']] for hotel, diff in min_price_diffs]
-
-        response = {
+    response = {
         "status": "success",
-        "message": "Travel details received",
+        "message": "response",
         "details": {
-            "flights": flights,
-            "best_hotels": best_hotels,
+            "response": "Email sent",
         }
     }
     return jsonify(response)
+
+
+
+if __name__ == '__main__':
+    app.run(debug=True)

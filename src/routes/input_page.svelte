@@ -269,6 +269,18 @@ async function GPT_response() {
   }
 }
 
+async function sendEmail() {
+  const data = {
+    user_email: user_email,
+    message: apiResponse
+  };
+  const response = await fetch("http://127.0.0.1:5000/api/send_email", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(data),
+    });
+}
+
 </script>
 
 <main>
@@ -338,9 +350,6 @@ async function GPT_response() {
           <input id="departure-date" type="text" value="{departureDate}" />
           <input id="return-date" type="text" value="{returnDate}" />
         
-          <h4>Step 7: Optionally enter your email address so we can send a copy of your personalized travel plan straight to your inbox</h4>
-          <input type="email" placeholder="youremail@example.com" bind:value="{user_email}" on:input="{handleEmailChange}"/>
-        
           <button on:click="{generate}" id="start_button">Ask your personalized travel agent</button>
         
           {/if}
@@ -408,7 +417,12 @@ async function GPT_response() {
           <strong>AI Response:</strong>
           ${apiResponse.response}
         </md-block>
-    </div>
+
+        <h2>Save for later</h2>
+        <h4>Enter your email address so we can send a copy of your personalized travel plan straight to your inbox</h4>
+        <input type="email" placeholder="youremail@example.com" bind:value="{user_email}" on:input="{handleEmailChange}"/>
+        <button id="start_button" on:click={sendEmail}>Send</button>
+      </div>
   {/if}
 
   {#if isLoading}
