@@ -281,7 +281,8 @@ def get_hotel_data(city_name, lat, lng, checkin, checkout, number_people):
                     'name': property.get('name'),
                     'price': price if price is not None else 0,
                     'url': property.get('link', 'No URL available'),
-                    "coords": property.get('gps_coordinates')
+                    "coords": property.get('gps_coordinates'),
+                    "picture": property.get('images')[0].get('thumbnail'),
                 }
                 hotels.append(hotel_data)
             
@@ -328,6 +329,7 @@ def get_openai_response(number_of_people, departure, destination, duration,fligh
 
     f"**Hotel Recommendation**\n"
     f"{best_hotels}"
+    f"Image"
     f"- Price (Per night):"
     f"- CLick here to book your stay at"
 
@@ -456,7 +458,12 @@ def hotels():
 
     # Sort by price difference and select the top 4
     min_price_diffs = sorted(min_price_diffs, key=lambda x: x[1])[:4]
-    best_hotels = [[hotel['name'], hotel['price'], hotel['url'], hotel['coords']] for hotel, diff in min_price_diffs]
+
+    best_hotels = [
+    [hotel['name'], hotel['price'], hotel['url'], hotel['coords'], hotel['picture']] 
+    for hotel, diff in min_price_diffs
+]
+    
     print(best_hotels)
     response = {
         "status": "success",

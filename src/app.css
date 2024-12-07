@@ -92,6 +92,14 @@ span {
   transform: translateY(-3px);
 }
 
+#select_button  {
+  background-color: #4a90e2;
+  color: white;
+  text-decoration: none;
+  transition: background 0.3s;
+  border-radius: 8px;
+}
+
 #start_button {
   margin-top: 2rem;
   padding: 0.75rem 1.5rem;
@@ -171,6 +179,10 @@ abs Container */
   input, select {
     font-size: 0.95em;
   }
+
+  .hotel-name {
+    font-size: 8px;
+  }
 }
 
 
@@ -239,4 +251,62 @@ input[type="text"] {
 
 .dropdown li:hover {
   background: #f0f0f0;
+}
+
+#hotelPage {
+  font-family: Arial, sans-serif;
+  padding: 20px;
+  max-width: 800px;
+  margin: 0 auto;
+}
+
+#hotelList {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.hotel-item {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  margin-bottom: 20px;
+  padding: 15px;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  background-color: #f9f9f9;
+}
+
+.hotel-info {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  flex: 1;
+}
+
+.hotel-name {
+  font-size: 16px;
+  margin-right: 20px;
+}
+
+.hotel-image {
+  width: 100px; /* Adjust size */
+  height: 100px; /* Adjust size */
+  object-fit: cover;
+  border-radius: 8px;
+  margin-right: 20px;
+}
+
+.select-button {
+  padding: 10px 15px;
+  background-color: #007BFF;
+  color: white;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  transition: background-color 0.3s;
+}
+
+.select-button:hover {
+  background-color: #0056b3;
 }

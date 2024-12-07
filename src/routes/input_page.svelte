@@ -112,7 +112,7 @@
   }
 
   function handleHotelSelection(event) {
-    const selectedHotelIndex = event.target.value;
+    const selectedHotelIndex = event;
     selectedHotel = availableHotels[selectedHotelIndex];
     console.log("Selected hotel:", selectedHotel);
     showGenerateButton = selectedFlight && selectedHotel;
@@ -137,7 +137,7 @@
 
   isLoading = true;
   try {
-    const response = await fetch("https://my-svelte-project.onrender.com/api/flights", {
+    const response = await fetch("http://127.0.0.1:5000/api/flights", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify(travelData)
@@ -180,7 +180,7 @@ async function generateHotel() {
 
   isLoading = true;
   try {
-    const response = await fetch("https://my-svelte-project.onrender.com/api/hotels", {
+    const response = await fetch("http://127.0.0.1:5000/api/hotels", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify(hotelData)
@@ -221,7 +221,7 @@ async function GPT_response() {
 
   isLoading = true;
   try {
-    const response = await fetch("https://my-svelte-project.onrender.com/api/second_step", {
+    const response = await fetch("http://127.0.0.1:5000/api/second_step", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify(data),
@@ -345,15 +345,34 @@ async function GPT_response() {
     {#if hotelPage && !isLoading}
     <div id="hotelPage">
       <h1>Select a Hotel</h1>
-      <select id="hotelSelect" on:change="{handleHotelSelection}">
-        <option value="">-- Select a Hotel --</option>
-        {#each availableHotels as hotel, index}
-          <option value="{index}">{hotel[0]} - {hotel[1]}$ per night</option>
-        {/each}
-      </select>
-      <button on:click="{GPT_response}" disabled="{!showGenerateButton}">Generate Itinerary</button>
+      {#if availableHotels && availableHotels.length > 0}
+        <ul id="hotelList">
+          {#each availableHotels as hotel, index}
+            <li class="hotel-item">
+              <div class="hotel-info">
+                <span class="hotel-name">{hotel[0]} - {hotel[1]}$ per night</span>
+                <img class="hotel-image" src="{hotel[4]}" alt="Hotel Image">
+              </div>
+              <button class="select-button"
+                on:click={() => handleHotelSelection(index)} 
+                aria-label="Select {hotel[0]}"
+              >
+                Select
+              </button>
+            </li>
+          {/each}
+        </ul>
+        <button id="start_button" on:click={GPT_response}>
+          {selectedHotel ? `Confirm ${selectedHotel[0]}` : 'Confirm Selection'}
+        </button>
+      {:else}
+        <p>No hotels available. Please try again later.</p>
+      {/if}
     </div>
   {/if}
+  
+  
+  
 
   {#if aiResponsePage && !isLoading}
     <div id="responsePage">
