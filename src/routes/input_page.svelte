@@ -137,7 +137,7 @@
 
   isLoading = true;
   try {
-    const response = await fetch("http://127.0.0.1:5000/api/flights", {
+    const response = await fetch("https://my-svelte-project.onrender.com/api/flights", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify(travelData)
@@ -180,7 +180,7 @@ async function generateHotel() {
 
   isLoading = true;
   try {
-    const response = await fetch("http://127.0.0.1:5000/api/hotels", {
+    const response = await fetch("https://my-svelte-project.onrender.com/api/hotels", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify(hotelData)
@@ -221,7 +221,7 @@ async function GPT_response() {
 
   isLoading = true;
   try {
-    const response = await fetch("http://127.0.0.1:5000/api/second_step", {
+    const response = await fetch("https://my-svelte-project.onrender.com/api/second_step", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify(data),
