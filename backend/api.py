@@ -20,7 +20,6 @@ load_dotenv()
 
 am_key = os.getenv("AM_KEY")
 am_auth = os.getenv("AM_AUTH")
-google_api_key = os.getenv("GOOGLE_API_KEY")
 ser_api_key = os.getenv("SER_API_KEY")
 openai_key = os.getenv("OPENAI_KEY")
 print(openai_key)
@@ -87,21 +86,6 @@ def get_freebase_id(city_name):
             return claims['P646'][0]['mainsnak']['datavalue']['value']
     return None
 
-
-def get_coords(city_name):
-    geocode_url = f'https://maps.googleapis.com/maps/api/geocode/json?address={city_name}&key={google_api_key}'
-    geocode_response = requests.get(geocode_url)
-
-
-    if geocode_response.status_code == 200:
-        geocode_data = geocode_response.json()
-        if geocode_data['status'] == 'OK' and geocode_data['results']:
-            # Get latitude and longitude
-            lat = geocode_data['results'][0]['geometry']['location']['lat']
-            lng = geocode_data['results'][0]['geometry']['location']['lng']
-        return lat, lng
-    else:
-        print("Error with google api")
 
 def get_website(name):  
     url = 'https://www.google.com/search'
@@ -248,7 +232,7 @@ def get_flight_price(departure_id, arrival_id, outbound_date, return_date=None,
         return "Error", 0
 
 
-def get_hotel_data(city_name, lat, lng, checkin, checkout, number_people):
+def get_hotel_data(city_name, checkin, checkout, number_people):
     try:
         # Define parameters for the request
         params = {
@@ -431,12 +415,11 @@ def hotels():
     duration = (d2 - d1).days
 
     print("getting coords for: ", destination)
-    lat, lng = get_coords(destination)
     
     total_extra_cost = int(price_per_person_per_day)*int(duration)*int(number_of_people)
     print("total extra: ", total_extra_cost, "flight: ", flight_price)
     per_night_budget = ((int(budget - int(flight_price))) - (total_extra_cost))/int(duration)
-    hotels = get_hotel_data(destination, lat, lng, str(depart_date), str(return_date), number_people=number_of_people)
+    hotels = get_hotel_data(destination,str(depart_date), str(return_date), number_people=number_of_people)
     print("hotels: ", hotels)
 
     best_hotels = []
