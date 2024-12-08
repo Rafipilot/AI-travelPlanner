@@ -249,6 +249,7 @@ async function GPT_response() {
     departure_date: departureDate,
     return_date: returnDate,
     budget: budget,
+
     price_per_person_per_day: price_per_person_per_day,
   };
 
@@ -279,7 +280,7 @@ async function GPT_response() {
 async function sendEmail() {
   const data = {
     user_email: user_email,
-    message: apiResponse
+    apiResponse,
   };
   const response = await fetch("https://my-svelte-project.onrender.com/api/send_email", {
       method: "POST",
