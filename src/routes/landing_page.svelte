@@ -3,10 +3,10 @@
 </script>
 
 <svelte:head>
-  <title>Travex | AI Travel Planner - Plan Your Dream Vacation</title>
+  <title>Travex | Free AI Travel Planner - Plan Your Dream Vacation</title>
   <meta
     name="description"
-    content="Plan your dream vacation in minutes with Travex. Our AI-powered tool personalizes travel plans, flights, hotels, and activities for a seamless experience."
+    content="Plan your dream vacation in minutes with Travex for free. Our AI-powered tool personalizes travel plans, flights, hotels, and activities for a seamless experience."
   />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <meta name="robots" content="index, follow" />
@@ -17,7 +17,7 @@
       "@type": "WebApplication",
       "name": "Travex",
       "url": "https://travex.world",
-      "description": "Plan your dream vacation in minutes with Travex. AI-powered travel plans tailored to you.",
+      "description": "Plan your dream vacation in minutes with Travex for free. AI-powered travel plans tailored to you.",
       "applicationCategory": "Travel",
       "operatingSystem": "All",
       "offers": {
@@ -36,6 +36,6 @@
     <p id="sub-title">Plan your dream vacation in minutes</p>
   </header>
 
-    <a href="/#/input_page" id="start_button">Get Started</a>
+    <a href="/#/input_page" id="start_button">Get Started for Free!</a>
 
 </main>
