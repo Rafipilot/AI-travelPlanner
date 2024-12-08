@@ -249,7 +249,6 @@ async function GPT_response() {
     departure_date: departureDate,
     return_date: returnDate,
     budget: budget,
-    user_email: user_email,
     price_per_person_per_day: price_per_person_per_day,
   };
 

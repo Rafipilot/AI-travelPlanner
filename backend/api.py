@@ -487,7 +487,6 @@ def response():
     depart_date = data.get('departure_date')
     return_date = data.get('return_date')
     budget = data.get('budget')
-    user_email = data.get('user_email')
     price_per_person_per_day = int(data.get('price_per_person_per_day'))
 
 
