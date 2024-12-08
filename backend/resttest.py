@@ -1,47 +1,68 @@
-from selenium import webdriver
-from selenium.webdriver.chrome.service import Service
-from selenium.webdriver.common.by import By
-from selenium.webdriver.chrome.options import Options
-from webdriver_manager.chrome import ChromeDriverManager
-from bs4 import BeautifulSoup
+from serpapi import GoogleSearch
+import re
+import os
+from dotenv import load_dotenv
 
-def get_hotel_data(city, checkin, checkout):
-    url = f"https://www.booking.com/searchresults.html?ss={city}&ssne={city}&ssne_untouched={city}&checkin={checkin}&checkout={checkout}&group_adults=2&no_rooms=1&group_children=0&sb_travel_purpose=leisure&selected_currency=USD"
-    
-    # Set up Selenium options
-    options = Options()
-    options.headless = True  # Run browser in headless mode (without GUI)
-    driver = webdriver.Chrome(service=Service(ChromeDriverManager().install()), options=options)
-    
-    # Load the page
-    driver.get(url)
-    
-    # Wait for the page to load
-    driver.implicitly_wait(10)  # Wait for up to 10 seconds for elements to load
-    
-    # Get the page source after it's fully rendered
-    html = driver.page_source
-    print(html)  # Output the page source for debugging
+load_dotenv()
 
-    driver.quit()  # Close the browser
-    
-    soup = BeautifulSoup(html, 'html.parser')
-    hotels = soup.find_all('div', {'data-testid': 'property-card'})
-    hotels_data = []
-    
-    for hotel in hotels:
-        name = hotel.find('div', {'data-testid': 'title'}).text.strip() if hotel.find('div', {'data-testid': 'title'}) else "N/A"
-        location = hotel.find('span', {'data-testid': 'address'}).text.strip() if hotel.find('span', {'data-testid': 'address'}) else "N/A"
+ser_api_key = os.getenv("SER_API_KEY")
+
+def get_hotel_data(city_name, checkin="2024-12-15", checkout="2024-12-20", number_people="2"):
+    try:
+        # Define parameters for the request
+        params = {
+            'engine': 'google_hotels',
+            'q': f"Hotels in {city_name}",
+            'check_in_date': checkin,
+            'check_out_date': checkout,
+            'adults': number_people,
+            'api_key': ser_api_key,
+        }
+
+        search = GoogleSearch(params)
+        results = search.get_dict()  # Get the JSON response as a dictionary
         
-        # Try to get the price
-        price_tag = hotel.find('span', {'data-testid': 'price-and-discounted-price'})
-        if price_tag:
-            price = price_tag.text.strip()
+        # Print the entire response for debugging
+        print("API Response:", results)
+
+        # Check if 'properties' exists in the response
+        if 'properties' not in results or not results['properties']:
+            print("No properties found in response.")
+            return []
+
+        # Extract hotel data from the response
+        hotels = []
+        for property in results['properties']:
+            # Extract and clean price information
+            price_string = property.get('rate_per_night', {}).get('lowest', 'Price not available')
+            price_clean = re.sub(r'[^\d.]', '', price_string)  # Remove non-numeric characters
+
+            try:
+                price = float(price_clean)
+            except ValueError:
+                price = None  # Handle cases where price conversion fails
+
+            # Build the hotel data dictionary
+            hotel_data = {
+                'name': property.get('name', 'No name available'),
+                'price': price if price is not None else 0,
+                'url': property.get('link', 'No URL available'),
+                'coords': property.get('gps_coordinates', {}),
+                'picture': property.get('images', [{}])[0].get('thumbnail', 'No picture available'),
+            }
+            hotels.append(hotel_data)
+
+        # Check if hotels were found
+        if hotels:
+            print("Hotels found:", hotels)
+            return hotels
         else:
-            price = "N/A"  # Default if no price is found
+            print("No hotels found with the provided query.")
+            return []
+    except Exception as e:
+        print("Error with SerpAPI:", e)
+        return []
 
-        hotels_data.append({'name': name, 'location': location, 'price': price})
-    
-    return hotels_data
-
-print(get_hotel_data("London", "10/12/24", "15/12/24"))
+# Test the function
+hotels = get_hotel_data("Malé")
+print("Final Hotel Data:", hotels)

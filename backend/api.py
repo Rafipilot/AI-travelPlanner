@@ -432,6 +432,7 @@ def hotels():
 
     print("getting coords for: ", destination)
     lat, lng = get_coords(destination)
+    
     total_extra_cost = int(price_per_person_per_day)*int(duration)*int(number_of_people)
     print("total extra: ", total_extra_cost, "flight: ", flight_price)
     per_night_budget = ((int(budget - int(flight_price))) - (total_extra_cost))/int(duration)
@@ -517,39 +518,6 @@ def response():
     cost = cost + int(hotels[1]*int(duration)) + int(flights['price']) + int(per_person_cost)
 
     ai_response = get_openai_response(number_of_people=number_of_people, departure=departure, destination=destination, duration=duration, flights=flights, weather_info=weather, best_hotels=hotels, activities=activities_array, restaurants=res, cost=cost, budget=budget, per_person_cost=per_person_cost)
-    
-
-    sender_email = "rafayellatif19@gmail.com"
-    receiver_email = user_email
-    password = "ulfl vgfa vjvx znsp"
-
-
-    processed_ai_response = preprocess_markdown(ai_response)
-
-    # Convert Markdown to HTML
-    html_content = markdown2.markdown(processed_ai_response)
-
-    # Email setup
-    msg = MIMEMultipart("alternative")
-    msg['From'] = sender_email
-    msg['To'] = receiver_email
-    msg['Subject'] = "AI Travel Plan!"
-
-    # Attach both plain text and HTML versions
-    msg.attach(MIMEText(processed_ai_response, "plain"))  # Plain text version
-    msg.attach(MIMEText(html_content, "html"))  # HTML version
-
-    # Send the email
-    try:
-        server = smtplib.SMTP('smtp.gmail.com', 587)
-        server.starttls()
-        server.login(sender_email, password)
-        server.sendmail(sender_email, receiver_email, msg.as_string())
-        print("Markdown email sent successfully!")
-    except Exception as e:
-        print(f"Failed to send email: {e}")
-    finally:
-        server.quit()
 
 
     response = {
