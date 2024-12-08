@@ -280,7 +280,7 @@ async function GPT_response() {
 async function sendEmail() {
   const data = {
     user_email: user_email,
-    apiResponse,
+    message: apiResponse,
   };
   const response = await fetch("https://my-svelte-project.onrender.com/api/send_email", {
       method: "POST",
