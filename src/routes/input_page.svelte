@@ -347,11 +347,11 @@ async function sendEmail() {
           <input type="number" placeholder="Number of People" bind:value="{number_of_people}" on:input="{handleNumberPeopleChange}" />
         
           <h4>Step 4: Budget (Flights, Hotels, Per Person Daily Extras)</h4>
-          <input type="range" min="100" max="20000" bind:value="{budget}" on:input="{handleBudgetChange}" />
+          <input type="range" min="100" max="20000" step="100" bind:value="{budget}" on:input="{handleBudgetChange}" />
           <span>{budget}$</span>
 
           <h4>Step 5: Per Person Daily Extras (Meals, Taxis, Activities, etc)</h4>
-          <input type="range" min="20" max="200" bind:value="{price_per_person_per_day}" on:input="{handlePricePerPerson}" />
+          <input type="range" min="20" max="200" step="10" bind:value="{price_per_person_per_day}" on:input="{handlePricePerPerson}" />
           <span>{price_per_person_per_day}$</span>
         
           <h4>Step 6: Travel Dates</h4>
