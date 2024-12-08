@@ -394,7 +394,9 @@ async function sendEmail() {
             <li class="hotel-item">
               <div class="hotel-info">
                 <span class="hotel-name">{hotel[0]} - {hotel[1]}$ per night</span>
-                <img class="hotel-image" src="{hotel[4]}" alt="Hotel Image">
+                <div class="hotel-image-container">
+                  <img class="hotel-image" src="{hotel[4]}" alt="Hotel Image" />
+                </div>
               </div>
               <button class="select-button"
                 on:click={() => handleHotelSelection(index)} 
@@ -408,13 +410,11 @@ async function sendEmail() {
         <button id="start_button" bind:this={confirmHotelButton} on:click={GPT_response}>
           {selectedHotel ? `Confirm ${selectedHotel[0]}` : 'Confirm Selection'}
         </button>
-        
       {:else}
         <p>No hotels available. Please try again later.</p>
       {/if}
     </div>
   {/if}
-  
   
   
 

@@ -252,50 +252,106 @@ input[type="text"] {
 .dropdown li:hover {
   background: #f0f0f0;
 }
-
 #hotelPage {
-  font-family: Arial, sans-serif;
   padding: 20px;
-  max-width: 800px;
-  margin: 0 auto;
 }
 
 #hotelList {
-  list-style: none;
+  list-style-type: none;
   padding: 0;
-  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
 }
 
 .hotel-item {
   display: flex;
-  flex-direction: row;
-  align-items: center;
-  margin-bottom: 20px;
-  padding: 15px;
+  flex-direction: column;
+  gap: 10px;
   border: 1px solid #ddd;
+  padding: 15px;
   border-radius: 8px;
   background-color: #f9f9f9;
+  transition: box-shadow 0.3s ease, transform 0.3s ease;
+}
+
+.hotel-item:hover {
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+  transform: translateY(-3px);
 }
 
 .hotel-info {
   display: flex;
-  flex-direction: row;
-  align-items: center;
-  flex: 1;
+  flex-direction: column;
+  gap: 10px;
 }
 
 .hotel-name {
-  font-size: 16px;
-  margin-right: 20px;
+  font-weight: bold;
+  font-size: 1.2em;
+  color: #333;
+}
+
+.hotel-image-container {
+  max-width: 100%;
+  height: auto;
+  overflow: hidden;
+  border-radius: 8px;
 }
 
 .hotel-image {
-  width: 100px; /* Adjust size */
-  height: 100px; /* Adjust size */
+  width: 100%;
+  height: auto;
+  max-width: 100%;
   object-fit: cover;
   border-radius: 8px;
-  margin-right: 20px;
 }
+
+.select-button {
+  background-color: #4a90e2;
+  color: white;
+  padding: 10px 20px;
+  border: none;
+  border-radius: 8px;
+  transition: background 0.3s ease;
+  cursor: pointer;
+}
+
+.select-button:hover {
+  background-color: #003366;
+}
+
+#start_button {
+  margin-top: 2rem;
+  padding: 0.75rem 1.5rem;
+  background-color: #4a90e2;
+  color: white;
+  font-size: 1.25rem;
+  border: none;
+  border-radius: 8px;
+  text-decoration: none;
+  transition: background 0.3s ease;
+}
+
+#start_button:hover {
+  transform: translateY(-3px);
+  background: #003366;
+}
+
+@media (max-width: 768px) {
+  .hotel-item {
+    flex-direction: column;
+  }
+
+  .hotel-name {
+    font-size: 1em;
+  }
+
+  #hotelList {
+    flex-direction: column;
+  }
+}
+
 
 .select-button {
   padding: 10px 15px;

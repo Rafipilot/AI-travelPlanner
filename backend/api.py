@@ -282,7 +282,7 @@ def get_hotel_data(city_name, lat, lng, checkin, checkout, number_people):
                     'price': price if price is not None else 0,
                     'url': property.get('link', 'No URL available'),
                     "coords": property.get('gps_coordinates'),
-                    "picture": property.get('images')[0].get('thumbnail'),
+                    "picture": property.get('images')[0].get('original_image'),
                 }
                 hotels.append(hotel_data)
             
