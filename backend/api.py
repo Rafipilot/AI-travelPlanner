@@ -131,11 +131,11 @@ def get_restaurants(lat, lng):
 
     return restaurants
 
-def get_activities(lat ,lng):
+def get_activities(city_name, lat ,lng):
     ll = f"@{lat}, {lng},15.1z"
     params = {
     "engine": "google_maps",
-    "q": "tourist attractions",
+    "q": f"tourist attractions in {city_name}",
     "ll": ll,
     "type": "search",
     "api_key": ser_api_key
@@ -484,7 +484,7 @@ def response():
     res = get_restaurants(lat, lng)
 
 
-    activities = get_activities(lat, lng)
+    activities = get_activities(destination, lat, lng)
     activities_array  = []
     for activity in activities:
         url = get_website((str(activity)+" tickets"))

@@ -3,6 +3,7 @@
   import input_page from "./routes/input_page.svelte"
   import landing_page from "./routes/landing_page.svelte"
   import about from "./routes/about.svelte"
+  import blog from "./routes/blog.svelte"
 
 
 
@@ -11,6 +12,7 @@
     "/":  landing_page,
     "/input_page": input_page,
     "/about_page": about,
+    "/blog_page": blog,
   }
 </script>
 
