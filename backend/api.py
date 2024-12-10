@@ -267,10 +267,10 @@ def get_hotel_data(city_name, checkin, checkout, number_people):
                     'url': property.get('link', 'No URL available'),
                     "coords": property.get('gps_coordinates'),
                     "picture": property.get('images')[0].get('original_image'),
-                    "rating": property.get('overall_rating'),
-                    "location_rating": property.get('overall_rating'),
-                    "amenities": property.get('amenities'),
-                    "description": property.get('description'),
+                    "rating": property.get('overall_rating', 'Not available'),
+                    "location_rating": property.get('overall_rating', 'Not available'),
+                    "amenities": property.get('amenities', 'Not available'),
+                    "description": property.get('description', 'Not available'),
                 }
                 hotels.append(hotel_data)
             
