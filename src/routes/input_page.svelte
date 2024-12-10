@@ -318,7 +318,7 @@ async function sendEmail() {
           </ul>
         {/if}
         <!-- Destination Search -->
-        <h4>Step 2: Enter your detination city</h4>
+        <h4>Step 2: Enter your destination city</h4>
         <input
           type="text"
           bind:value="{Destination_searchQuery}"
