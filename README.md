@@ -15,5 +15,5 @@ Travex is an AI-powered travel planning platform that simplifies your travel exp
 - **Backend**: Python (Flask)
 
 
-### Website: [Travex](https://www.travex.com)
+### Website: [Travex](https://www.travex.world)
 
