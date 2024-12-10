@@ -59,15 +59,18 @@
     document.head.appendChild(script);
   });
 
+
   onMount(() => {
+  const today = new Date().toISOString().split('T')[0];
+
   departureDatePicker = flatpickr("#departure-date", {
+    minDate: today, // Set minimum date at initialization
     onChange: (selectedDates) => {
       if (selectedDates.length > 0) {
         const date = selectedDates[0];
         departureDate = `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}-${String(date.getDate()).padStart(2, '0')}`;
-        
         if (returnDatePicker) {
-          returnDatePicker.set('minDate', date); // Ensure return date cannot be before departure date
+          returnDatePicker.set('minDate', date); // Update return date's minimum
         }
       }
     }
@@ -82,6 +85,7 @@
     }
   });
 });
+
 
 
 
@@ -166,7 +170,7 @@
   };
   if (!departure_city || !destination_city || !number_of_people) {
     alert("Please fill in all the required fields.");
-    return; // Stop execution if inputs are invalid
+    return; 
   }
 
   isLoading = true;
