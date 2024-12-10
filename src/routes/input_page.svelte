@@ -397,7 +397,10 @@ async function sendEmail() {
                 <div class="hotel-image-container">
                   <img class="hotel-image" src="{hotel[4]}" alt="Hotel Image" />
                 </div>
+                <span>Rating: {hotel[5]}</span>
+                <span>Description: {hotel[6]}</span>
               </div>
+              
               <button class="select-button"
                 on:click={() => handleHotelSelection(index)} 
                 aria-label="Select {hotel[0]}"

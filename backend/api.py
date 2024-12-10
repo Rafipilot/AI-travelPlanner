@@ -267,11 +267,16 @@ def get_hotel_data(city_name, checkin, checkout, number_people):
                     'url': property.get('link', 'No URL available'),
                     "coords": property.get('gps_coordinates'),
                     "picture": property.get('images')[0].get('original_image'),
+                    "rating": property.get('overall_rating'),
+                    "location_rating": property.get('overall_rating'),
+                    "amenities": property.get('amenities'),
+                    "description": property.get('description'),
                 }
                 hotels.append(hotel_data)
             
             if len(hotels) != 0:
                 print("hotels: ", hotels)
+                print(hotels)
                 return hotels
             else:
                 print(hotels)
@@ -445,7 +450,7 @@ def hotels():
     min_price_diffs = sorted(min_price_diffs, key=lambda x: x[1])[:4]
 
     best_hotels = [
-    [hotel['name'], hotel['price'], hotel['url'], hotel['coords'], hotel['picture']] 
+    [hotel['name'], hotel['price'], hotel['url'], hotel['coords'], hotel['picture'], hotel['rating'], hotel['description']] 
     for hotel, diff in min_price_diffs
 ]
     
