@@ -76,7 +76,7 @@ span {
   border: 2px solid #4a90e2;
   margin-left: 5px;
   margin-top: 5px;
-  padding: 10px 20px;
+  padding: 10px 10px;
   display: inline-block;
   font-family: 'Arial', sans-serif;
   border-radius: 8px;
@@ -182,6 +182,9 @@ abs Container */
 
   .hotel-name {
     font-size: 8px;
+  }
+  #links {
+    padding: 10px 10px;
   }
 }
 
