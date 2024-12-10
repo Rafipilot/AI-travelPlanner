@@ -164,8 +164,8 @@
     return_date: returnDate,
     
   };
-  if (!departure_city || !destination_city) {
-    alert("Please fill in both the departure city and the destination city.");
+  if (!departure_city || !destination_city || !number_of_people) {
+    alert("Please fill in all the required fields.");
     return; // Stop execution if inputs are invalid
   }
 
