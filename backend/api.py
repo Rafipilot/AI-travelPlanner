@@ -110,11 +110,11 @@ def get_website(name):
         first_link = None
         return "none found"
 
-def get_restaurants(lat, lng):
+def get_restaurants(city, lat, lng):
     ll = f"@{lat}, {lng},15.1z"
     params = {
     "engine": "google_maps",
-    "q": "restaurants",
+    "q": f"restaurants in {city}",
     "ll": ll,
     "type": "search",
     "api_key": ser_api_key
@@ -486,7 +486,7 @@ def response():
     lng = hotels[3] ['longitude']
 
 
-    res = get_restaurants(lat, lng)
+    res = get_restaurants(destination, lat, lng)
 
 
     activities = get_activities(destination, lat, lng)
