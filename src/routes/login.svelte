@@ -1,46 +1,66 @@
 <script>
-
-    let username = '';
-    let password = '';
-    let error = '';
+  import { user } from './store';
+  import axios from 'axios';
+  import { onMount } from 'svelte';
   
-    const handleLogin = async () => {
-  try {
-    const response = await fetch('http://127.0.0.1:5000/login', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json'
-      },
-      body: JSON.stringify({ username, password })
-    });
+  let email = '';
+  let password = '';
+  let message = '';
+  let isLoggedIn = false;
 
-    console.log(response); // Log response to see what it returns
-
-    if (response.ok) {
-      // On successful login, redirect to dashboard
-      window.location.href = '/#/dashboard';
-    } else {
-      const result = await response.json();
-      error = result.message || 'Invalid credentials';
+  const registerUser = async () => {
+    try {
+      const response = await axios.post('http://localhost:5000/register', {
+        email,
+        password
+      });
+      message = response.data.message;
+    } catch (error) {
+      message = error.response.data.error;
     }
-  } catch (err) {
-    console.error(err); // Log error to understand why it occurred
-    error = 'An error occurred';
-  }
-};
+  };
 
-  </script>
-  
-  <main>
-    <h2>Login</h2>
-    <form on:submit|preventDefault={handleLogin}>
-      <input type="text" placeholder="Username" bind:value={username} required>
-      <input type="password" placeholder="Password" bind:value={password} required>
-      <button type="submit">Login</button>
-    </form>
-    {#if error}
-      <p>{error}</p>
-    {/if}
-    <p>Don't have an account? <a href="/#/create-user">Create a new user</a></p>
-  </main>
-  
+  const loginUser = async () => {
+    try {
+      const response = await axios.post('http://localhost:5000/login', {
+        email,
+        password
+      });
+      message = response.data.message;
+      user.set(response.data);  // Set the user data in the store
+      isLoggedIn = true;
+    } catch (error) {
+      message = error.response.data.error;
+    }
+  };
+</script>
+
+<main>
+  {#if !isLoggedIn}
+    <h1>Login / Register</h1>
+    <input bind:value={email} placeholder="Email" type="email" />
+    <input bind:value={password} placeholder="Password" type="password" />
+    <button on:click={loginUser}>Login</button>
+    <button on:click={registerUser}>Register</button>
+    <p>{message}</p>
+  {:else}
+    <h1>Hi {email}</h1>
+  {/if}
+</main>
+
+<style>
+  main {
+    text-align: center;
+    margin-top: 50px;
+  }
+
+  input {
+    margin: 5px;
+    padding: 10px;
+  }
+
+  button {
+    padding: 10px;
+    margin: 10px;
+  }
+</style>

@@ -1,42 +1,44 @@
 <script>
-    import { navigate } from "svelte-routing";
-    let username = '';
-    let password = '';
-    let error = '';
-  
-    const handleCreateUser = async () => {
-      try {
-        const response = await fetch('http://127.0.0.1:5000/create_user', {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json'
-          },
-          body: JSON.stringify({ username, password })
-        });
-  
-        if (response.ok) {
-          // Redirect to login after successful user creation
-          navigate('/login');
-        } else {
-          const result = await response.json();
-          error = result.message || 'Failed to create user';
-        }
-      } catch (err) {
-        error = 'An error occurred';
-      }
-    };
-  </script>
-  
-  <main>
-    <h2>Create a New User</h2>
-    <form on:submit|preventDefault={handleCreateUser}>
-      <input type="text" placeholder="Username" bind:value={username} required>
-      <input type="password" placeholder="Password" bind:value={password} required>
-      <button type="submit">Create User</button>
-    </form>
-    {#if error}
-      <p>{error}</p>
-    {/if}
-    <p>Already have an account? <a href="/login">Login here</a></p>
-  </main>
-  
+  let username = '';
+  let password = '';
+  let error = '';
+  let successMessage = '';
+
+  const handleSubmit = async () => {
+    const response = await fetch('http://127.0.0.1:5000/register', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ username, password }),
+    });
+
+    if (response.ok) {
+      successMessage = 'User registered successfully! You can now log in.';
+      username = '';
+      password = '';
+      error = '';
+    } else {
+      const data = await response.json();
+      error = data.message;
+      successMessage = '';
+    }
+  };
+</script>
+
+<main>
+  <h1>Create Account</h1>
+  {#if error}
+    <p style="color: red;">{error}</p>
+  {/if}
+  {#if successMessage}
+    <p style="color: green;">{successMessage}</p>
+  {/if}
+  <form on:submit|preventDefault={handleSubmit}>
+    <label for="username">Username</label>
+    <input type="text" id="username" bind:value={username} required />
+    
+    <label for="password">Password</label>
+    <input type="password" id="password" bind:value={password} required />
+    
+    <button type="submit">Register</button>
+  </form>
+</main>
