@@ -450,7 +450,7 @@ def hotels():
     min_price_diffs = sorted(min_price_diffs, key=lambda x: x[1])[:4]
 
     best_hotels = [
-    [hotel['name'], hotel['price'], hotel['url'], hotel['coords'], hotel['picture'], hotel['rating'], hotel['description']] 
+    [hotel['name'], hotel['price'], hotel['url'], hotel['coords'], hotel['picture'], hotel['rating'], hotel['description'], hotel['amenities']] 
     for hotel, diff in min_price_diffs
 ]
     

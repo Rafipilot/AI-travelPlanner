@@ -403,6 +403,15 @@ async function sendEmail() {
                 </div>
                 <span>Rating: {hotel[5]}</span>
                 <span>Description: {hotel[6]}</span>
+                <span>Amenities</span>
+                <ul id="a_list">
+                  {#each hotel[7] as amenity, index}
+
+                      <span>{amenity}</span>
+
+                  {/each}
+                </ul>
+                
               </div>
               
               <button class="select-button"
