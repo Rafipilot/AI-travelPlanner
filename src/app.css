@@ -15,17 +15,6 @@ body {
 }
 
 
-main {
-  max-width: 900px;
-  margin: 50px auto;
-  background-color: #ffffff;
-  border-radius: 12px;
-  padding: 30px;
-  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
-  border: 1px solid #ddd;
-}
-
-
 h1 {
   text-align: center;
   font-size: 2.2em;
@@ -43,6 +32,11 @@ label {
   color: #555;
 }
 
+main  {
+  padding-left: 2.5rem;
+  padding-right: 2.5rem;
+
+}
 
 input, select {
   width: 100%;
@@ -385,4 +379,56 @@ input[type="text"] {
   padding: 5px 10px;
   border-radius: 5px;
   font-size: 14px;
+}
+
+
+.flex-container {
+  display: flex;
+  flex-wrap: wrap; /* Allows the items to wrap on smaller screens */
+  justify-content: space-evenly; /* Even spacing between the boxes */
+  align-items: center; /* Vertical alignment */
+  gap: 1rem; /* Space between items */
+  padding: 1rem;
+}
+
+.infoBox {
+  flex: 1 1 calc(33.33% - 2rem); /* 3 boxes per row with space */
+  min-width: 300px; /* Minimum width for the boxes */
+  max-width: 400px; /* Maximum width to prevent oversized boxes */
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  padding: 1rem;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  text-align: center;
+  background: #f9f9f9;
+}
+
+.infoBox h3 {
+  font-size: 1.25rem;
+  margin-bottom: 1rem;
+}
+
+.scrollable-list {
+  max-height: 150px;
+  overflow-y: auto; /* Scrollable list for longer content */
+  padding: 0;
+  margin: 0;
+  list-style-type: none;
+}
+
+.scrollable-list li {
+  padding: 0.5rem 0;
+  border-bottom: 1px solid #ddd;
+}
+
+@media screen and (max-width: 1024px) {
+  .infoBox {
+    flex: 1 1 calc(50% - 2rem); /* 2 boxes per row */
+  }
+}
+
+@media screen and (max-width: 768px) {
+  .infoBox {
+    flex: 1 1 100%; /* Stacks the boxes vertically */
+  }
 }
