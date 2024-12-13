@@ -88,19 +88,61 @@
         console.error("Invalid input for unflattening hotels");
         return [];
     }
-    
-    // Assuming the input is an array with hotel objects
     return hotels.map(hotel => [hotel.name, hotel.price, hotel.website]);
 }
+function unflattenActivities(activities) {
+    // Validate input
+    if (!activities || !Array.isArray(activities)) {
+        console.error("Invalid input for unflattening activities");
+        return [];
+    }
+    const activitiesArray = [];
+    // Iterate through the activities array
+    for (const activity of activities) {
+        if (activity && typeof activity === 'object' && activity.name && activity.website) {
+            const activityList = [activity.name, activity.website];
+            
+            activitiesArray.push(activityList);
+        } else {
+            console.warn("Invalid activity encountered", activity);
+        }
+    }
+    return activitiesArray;
+}
 
+function unflattenRestaurants(res) {
+    // Validate input
+    if (!res || !Array.isArray(res)) {
+        console.error("Invalid input for unflattening activities");
+        return [];
+    }
+
+    // Create an array to store processed activities
+    const r_array = [];
+
+    // Iterate through the activities array
+    for (const r of res) {
+        if (r && typeof r === 'object' && r.name && r.website) {
+
+            const r_list = [r.name, r.website];
+            
+            // Append to the result array
+            r_array.push(r_list);
+        } else {
+            console.warn("Invalid activity encountered", r);
+        }
+    }
+
+    return r_array;
+}
   function get_cloud_trip(trip)  {
 
     selectedFlight = trip["selected_flights"]
     selectedHotel = trip["selected_hotel"]
     selectedHotel = unflattenHotels(selectedHotel)[0]
     console.log(selectedHotel)
-    activities = trip["activities"]
-    restaurants = trip["restaurants"]
+    activities = unflattenActivities(trip["activities"])
+    restaurants = unflattenRestaurants(trip["restaurants"])
     departure_city = trip["departure_city"]
     destination_city = trip["destination_city"]
     apiResponse = {"response": trip["ai_response"]}
