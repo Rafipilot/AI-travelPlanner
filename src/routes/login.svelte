@@ -302,7 +302,7 @@ async function get_trips()  {
     console.log(result)
     cloud_trips = result.trips
 
-    alert("Trip saved successfully!");
+
   } catch (error) {
     console.error("Error getting trip:", error);
     alert("An error occurred while getting trips.");
@@ -416,13 +416,12 @@ async function delete_trip()  {
     <h1>Login / Register</h1>
     <input bind:value={email} placeholder="Email" type="email" />
     <input bind:value={password} placeholder="Password" type="password" />
-    <button on:click={loginUser} id="general_button">Login</button>
+    <button on:click={loginUser} on:click={get_trips} id="general_button">Login</button>
     <button on:click={registerUser} id="general_button">Register</button>
     <p>{message}</p>
   {:else}
     {#if show_dashboard}
       <h1>Hi {email}</h1>
-      <button on:click={get_trips}>Get trips</button>
       <h2>Your trips</h2>
       <button on:click={toggle_input_page} id="general_button">Plan a new trip</button>
       <div id="saved_trips">
@@ -499,7 +498,7 @@ async function delete_trip()  {
           <input id="departure-date" type="date" bind:value="{departureDate}" />
         
           <label for="return-date">Return Date:</label>
-          <input id="return-date" type="date" bind:value="{returnDate}" />
+          <input id="return-date" type="date" bind:value="{returnDate}" min={departureDate} />
           
         
           <button on:click="{generate}" id="start_button">Ask your personalized travel agent</button>
@@ -569,9 +568,11 @@ async function delete_trip()  {
     {#if aiResponsePage && !isLoading}
     <div id="responsePage">
       <h1>Your Trip</h1>
+      
       <button on:click={saveTrip} id="general_button">Save Trip</button>
       <button on:click={delete_trip} id="general_button">Delete Trip</button>
-      <button on:click={() => { show_dashboard = true; aiResponsePage = false; }} id="general_button">Back to dashboard</button>
+      <button on:click={() => { show_dashboard = true; aiResponsePage = false; }} on:click={get_trips} id="general_button">Back to dashboard</button>
+      <h2>{departure_city} to {destination_city}</h2>
       <div class="flex-container">
         
         <!-- Flights Section -->

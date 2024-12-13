@@ -689,7 +689,7 @@ def get_trips():
         trips.append(trip_data)
 
     if not trips:
-        return jsonify({"message": "No trips found for this user"}), 404
+        return jsonify({"message": "No trips found for this user"}), 200
 
     print("trips", trips)
     return jsonify({"trips": trips}), 200
