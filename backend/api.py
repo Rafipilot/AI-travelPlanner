@@ -23,7 +23,7 @@ from firebase_admin import firestore
 
 
 # Initialize Firebase Admin SDK
-cred = credentials.Certificate("backend\\secrets\\travex-76b7c-firebase-adminsdk-e5972-d297b4d236.json")
+cred = credentials.Certificate("backend\\secrets\\travex-76b7c-firebase-adminsdk-e5972-5286576eb5.json")
 firebase_admin.initialize_app(cred)
 
 db = firestore.client()
@@ -600,13 +600,14 @@ def login():
     
 @app.route('/api/save_trip', methods=['POST'])
 def save_trip():
-    print("hello")
+  
     try:
         # Parse the request JSON
         data = request.json
         required_fields = ["user_email", "destination_city", "departure_city", "selected_flights", 
-                           "selected_hotel", "restaurants", "activities"]
-        
+                           "selected_hotel", "restaurants", "activities", "ai_response"]
+        print("hello")
+        print(data["ai_response"])
         # Validate required fields
         for field in required_fields:
             if field not in data:
@@ -615,7 +616,7 @@ def save_trip():
                 
                 # Prepare trip data for Firestore
         h = data["selected_hotel"]
-        print(h)
+
         hotel  = [
             {
                 "name": h[0],
@@ -626,7 +627,7 @@ def save_trip():
             }
         ]
 
-        print(hotel)
+
         restaurants = [
             {
                 "name": r[0],
@@ -645,7 +646,6 @@ def save_trip():
             }
             for a in data["activities"]
         ]
-        print("hotel", hotel)
         # Save the transformed data
         trip_data = {
             "user_email": data["user_email"],
@@ -655,10 +655,11 @@ def save_trip():
             "selected_hotel": hotel,
             "restaurants": restaurants,
             "activities": activities,
+            "ai_response": data["ai_response"],
             "timestamp": firestore.SERVER_TIMESTAMP
         }
 
-        print("saving trip data: ", trip_data)
+
         # Create a new document in the 'trips' collection
         doc_ref = db.collection('trips').add(trip_data)
         return jsonify({"message": "Trip saved successfully"}), 200
@@ -694,6 +695,31 @@ def get_trips():
     return jsonify({"trips": trips}), 200
 
 
+@app.route('/api/delete_trip', methods=['POST'])
+def delete_trip():
+    try:
+        # Get the document ID from the request
+        document_id = request.json.get("ID")
+        
+        if not document_id:
+            return jsonify({"error": "No document ID provided"}), 400
+
+        # Reference the collection and delete the document
+        trip_ref = db.collection('trips').document(document_id)
+        
+        # Check if the document exists
+        if not trip_ref.get().exists:
+            return jsonify({"error": "Trip not found"}), 404
+
+        # Delete the document
+        trip_ref.delete()
+        
+        print(f"Deleted trip with ID: {document_id}")
+        return jsonify({"message": "Trip deleted successfully"}), 200
+
+    except Exception as e:
+        print(f"Error deleting trip: {e}")
+        return jsonify({"error": "An error occurred while deleting the trip"}), 500
 
 
 if __name__ == '__main__':

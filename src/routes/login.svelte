@@ -48,7 +48,7 @@
 
   let activities = null;
   let restaurants = null;
-
+  let docID = null;
 
   let cloud_trips = []
 
@@ -103,9 +103,10 @@
     restaurants = trip["restaurants"]
     departure_city = trip["departure_city"]
     destination_city = trip["destination_city"]
-    apiResponse = "Test"
-    console.log(selectedHotel, selectedHotel, activities, restaurants, departure_city, destination_city)
+    apiResponse = {"response": trip["ai_response"]}
+    docID = trip["id"]
     aiResponsePage = true
+    show_dashboard = false
   }
 
   
@@ -260,10 +261,7 @@ async function saveTrip() {
     selected_hotel: selectedHotel,
     restaurants,
     activities,
-
-
-    
-    
+    ai_response: apiResponse.response, 
   };
 
   try {
@@ -303,12 +301,37 @@ async function get_trips()  {
     const result = await response.json();
     console.log(result)
     cloud_trips = result.trips
+
     alert("Trip saved successfully!");
   } catch (error) {
     console.error("Error getting trip:", error);
     alert("An error occurred while getting trips.");
   }
+}
+async function delete_trip()  {
+  const user_data = {
+    ID: docID,
+  }
 
+  try {
+    const response = await fetch("http://127.0.0.1:5000/api/delete_trip", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(user_data)
+    });
+
+
+  if (!response.ok) {
+      throw new Error("Failed to delete trip. Please try again.");
+    }
+    const result = await response.json();
+    console.log(result)
+
+    alert("Trip deleted successfully!");
+  } catch (error) {
+    console.error("Error deleting trip:", error);
+    alert("An error occurred while deleting trips.");
+  }
 }
 
 
@@ -393,18 +416,20 @@ async function get_trips()  {
     <h1>Login / Register</h1>
     <input bind:value={email} placeholder="Email" type="email" />
     <input bind:value={password} placeholder="Password" type="password" />
-    <button on:click={loginUser}>Login</button>
-    <button on:click={registerUser}>Register</button>
+    <button on:click={loginUser} id="general_button">Login</button>
+    <button on:click={registerUser} id="general_button">Register</button>
     <p>{message}</p>
   {:else}
     {#if show_dashboard}
       <h1>Hi {email}</h1>
       <button on:click={get_trips}>Get trips</button>
       <h2>Your trips</h2>
-      <button on:click={toggle_input_page}>Plan a new trip</button>
-      {#each cloud_trips as trip, index}
-        <button on:click={() => get_cloud_trip(trip)}>{trip["destination_city"]}</button>
-      {/each}
+      <button on:click={toggle_input_page} id="general_button">Plan a new trip</button>
+      <div id="saved_trips">
+        {#each cloud_trips as trip, index}
+          <button on:click={() => get_cloud_trip(trip)} id="trip_button">{trip["destination_city"]}</button>
+        {/each}
+      </div>
     {/if}
     {#if show_input_page}
 
@@ -544,7 +569,9 @@ async function get_trips()  {
     {#if aiResponsePage && !isLoading}
     <div id="responsePage">
       <h1>Your Trip</h1>
-      <button on:click={saveTrip}>Save Trip</button>
+      <button on:click={saveTrip} id="general_button">Save Trip</button>
+      <button on:click={delete_trip} id="general_button">Delete Trip</button>
+      <button on:click={() => { show_dashboard = true; aiResponsePage = false; }} id="general_button">Back to dashboard</button>
       <div class="flex-container">
         
         <!-- Flights Section -->
