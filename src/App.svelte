@@ -3,15 +3,14 @@
 
   import login from "./routes/login.svelte"
   import Dashboard from "./routes/dashboard.svelte"
-  import create from "./routes/create-user.svelte"
+  import about from "./routes/about.svelte"
+  import blog from "./routes/blog.svelte"
 
-
-
-//test
   let routes = {
     "/":  login,
-    "/create-user": create,
-    "/dashboard": Dashboard
+    "/dashboard": Dashboard,
+    "/about_page": about,
+    "/blog_page": blog,
   }
 </script>
 
