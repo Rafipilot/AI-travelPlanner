@@ -574,7 +574,7 @@ def register():
     except auth.UserNotFoundError:
         # Create new user
         user = auth.create_user(email=email, password=password)
-        return jsonify({"message": "User created", "uid": user.uid}), 201
+        return jsonify({"message": "User created, you can now log in to your account", "uid": user.uid}), 201
     except Exception as e:
         return jsonify({"error": str(e)}), 400
 
@@ -589,7 +589,7 @@ def login():
         user = auth.get_user_by_email(email)
         return jsonify({"message": f"Hello {user.email}", "uid": user.uid}), 200
     except auth.UserNotFoundError:
-        return jsonify({"error": "User not found"}), 400
+        return jsonify({"error": "User not found, try registering your account first"}), 400
     except Exception as e:
         return jsonify({"error": str(e)}), 400
     
