@@ -504,6 +504,7 @@ async function delete_trip()  {
   {#if show_dashboard}
   <h1>Hi {email}</h1>
   <h2 id = "central_subheader">Your trips</h2>
+  <button on:click={toggle_input_page} id="general_button">Plan a new trip</button>
   <div id="dashboard-container">
     {#if cloud_trips && cloud_trips.length > 0}
     <div id="trips-container">

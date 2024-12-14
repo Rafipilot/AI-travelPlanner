@@ -210,6 +210,10 @@ abs Container */
     padding: 20px;
   }
 
+  h1  {
+    font-size: 1.5rem;
+  }
+
   #sub-title {
     font-size: 1rem;
   }
