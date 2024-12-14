@@ -136,7 +136,6 @@ function unflattenRestaurants(res) {
     return r_array;
 }
   function get_cloud_trip(trip)  {
-
     selectedFlight = trip["selected_flights"]
     selectedHotel = trip["selected_hotel"]
     selectedHotel = unflattenHotels(selectedHotel)[0]
@@ -147,6 +146,8 @@ function unflattenRestaurants(res) {
     destination_city = trip["destination_city"]
     apiResponse = {"response": trip["ai_response"]}
     docID = trip["id"]
+    departureDate = trip["departure_date"]
+    returnDate = trip["return_date"]
     aiResponsePage = true
     show_dashboard = false
   }
@@ -304,6 +305,8 @@ async function saveTrip() {
     restaurants,
     activities,
     ai_response: apiResponse.response, 
+    departure_date: departureDate,
+    return_date: returnDate,
   };
 
   try {
@@ -615,6 +618,7 @@ async function delete_trip()  {
       <button on:click={delete_trip} id="general_button">Delete Trip</button>
       <button on:click={() => { show_dashboard = true; aiResponsePage = false; }} on:click={get_trips} id="general_button">Back to dashboard</button>
       <h2>{departure_city} to {destination_city}</h2>
+      <h4>{departureDate} to  {returnDate}</h4>
       <div class="flex-container">
         
         <!-- Flights Section -->
@@ -637,7 +641,7 @@ async function delete_trip()  {
           <h3 class="sectionHeader">Hotels</h3>
           <div class="infoContent">
             <h4>{selectedHotel[0]}</h4>
-            <p><strong>Price:</strong> ${selectedHotel[1]}</p>
+            <p><strong>Price(Per Night):</strong> ${selectedHotel[1]}</p>
             <p><strong>Website:</strong> <a href="{selectedHotel[2]}" target="_blank">View Hotel</a></p>
           </div>
         </div>
@@ -648,7 +652,8 @@ async function delete_trip()  {
           <div class="infoContent">
             <ul class="scrollable-list">
               {#each activities as activity}
-                <li>{activity}</li>
+                <li>{activity[0]}</li>
+                <li><a href={activity[1]}>Website</a></li>
               {/each}
             </ul>
           </div>
@@ -660,7 +665,8 @@ async function delete_trip()  {
           <div class="infoContent">
             <ul class="scrollable-list">
               {#each restaurants as res}
-                <li>{res}</li>
+                <li>{res[0]}</li>
+                <li><a href={res[1]}>Website</a></li>
               {/each}
             </ul>
           </div>

@@ -18,15 +18,8 @@ import markdown2
 from firebase_admin import credentials, auth
 import firebase_admin
 from firebase_admin import firestore
+import json
 
-
-
-
-# Initialize Firebase Admin SDK
-cred = credentials.Certificate("backend\\secrets\\travex-76b7c-firebase-adminsdk-e5972-5286576eb5.json")
-firebase_admin.initialize_app(cred)
-
-db = firestore.client()
 
 app = Flask(__name__)
 CORS(app)
@@ -38,8 +31,13 @@ am_key = os.getenv("AM_KEY")
 am_auth = os.getenv("AM_AUTH")
 ser_api_key = os.getenv("SER_API_KEY")
 openai_key = os.getenv("OPENAI_KEY")
+service_account_info = json.loads(os.getenv("FIRESTORE_KEY"))
 
+# Initialize Firebase Admin SDK
+cred = credentials.Certificate(service_account_info)
+firebase_admin.initialize_app(cred)
 
+db = firestore.client()
 
 
 app = Flask(__name__)
@@ -600,12 +598,11 @@ def login():
     
 @app.route('/api/save_trip', methods=['POST'])
 def save_trip():
-  
     try:
         # Parse the request JSON
         data = request.json
         required_fields = ["user_email", "destination_city", "departure_city", "selected_flights", 
-                           "selected_hotel", "restaurants", "activities", "ai_response"]
+                           "selected_hotel", "restaurants", "activities", "ai_response", "departure_date", "return_date"]
         print("hello")
         print(data["ai_response"])
         # Validate required fields
@@ -622,8 +619,6 @@ def save_trip():
                 "name": h[0],
                 "price": h[1],
                 "website": h[2],
-
-
             }
         ]
 
@@ -655,6 +650,8 @@ def save_trip():
             "selected_hotel": hotel,
             "restaurants": restaurants,
             "activities": activities,
+            "departure_date": data["departure_date"],
+            "return_date": data["return_date"],
             "ai_response": data["ai_response"],
             "timestamp": firestore.SERVER_TIMESTAMP
         }
