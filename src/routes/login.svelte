@@ -52,7 +52,10 @@
 
   let cloud_trips = []
 
+  let datePicker_min = new Date().toISOString().split("T")[0];
+
     onMount(async () => {
+    
     const script = document.createElement('script');
     script.src = 'https://md-block.verou.me/md-block.js';
     script.type = 'module';
@@ -352,7 +355,7 @@ async function get_trips_and_return_to_dashboard() {
     console.log("show")
     show_dashboard = true
     aiResponsePage = false
-
+    show_input_page = false
 
   } catch (error) {
     console.error("Error getting trip:", error);
@@ -589,7 +592,7 @@ async function delete_trip()  {
         
           <h4>Step 6: Travel Dates</h4>
           <label for="departure-date">Departure Date:</label>
-          <input id="departure-date" type="date" bind:value="{departureDate}" />
+          <input id="departure-date" type="date" bind:value="{departureDate}" min={datePicker_min}/>
         
           <label for="return-date">Return Date:</label>
           <input id="return-date" type="date" bind:value="{returnDate}" min={departureDate} />
