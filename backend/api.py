@@ -15,6 +15,15 @@ import smtplib
 from email.mime.text import MIMEText
 from email.mime.multipart import MIMEMultipart
 import markdown2
+from firebase_admin import credentials, auth
+import firebase_admin
+from firebase_admin import firestore
+import json
+
+
+app = Flask(__name__)
+CORS(app)
+
 
 load_dotenv()
 
@@ -22,8 +31,13 @@ am_key = os.getenv("AM_KEY")
 am_auth = os.getenv("AM_AUTH")
 ser_api_key = os.getenv("SER_API_KEY")
 openai_key = os.getenv("OPENAI_KEY")
-print(openai_key)
+service_account_info = json.loads(os.getenv("FIRESTORE_KEY"))
 
+# Initialize Firebase Admin SDK
+cred = credentials.Certificate(service_account_info)
+firebase_admin.initialize_app(cred)
+
+db = firestore.client()
 
 
 app = Flask(__name__)
@@ -306,32 +320,6 @@ def get_openai_response(number_of_people, departure, destination, duration,fligh
     f"- Destination Location: {destination}\n\n"
     f"- Budget: {budget}"
 
-    f"**Flight Information:**\n"
-    f"Info: {flights} "
-    f"- Airline: {flights['airlines'][0]}\n"
-    f"- Price: {flights['price']}$ (Return tickets)\n"
-    f"- Flight Details: Departure from {departure} and return from {destination}. Include flight duration and any relevant details.\n\n"
-    f"- URL to bookling page of airline: {flights['url']}"
-
-    f"**Weather info**"
-    f"{weather_info}"
-    f"Based on weather info give some tips to the traveller(s)"
-
-    f"**Hotel Recommendation**\n"
-    f"{best_hotels}"
-    f"Image"
-    f"- Price (Per night):"
-    f"- CLick here to book your stay at"
-
-    f"**Restaurant Options based on your hotel location, give {duration} amount of options:"
-    f"{restaurants}"
-    f"restaurant name"
-    f"restaurant website"
-
-    f"**Activities and Attractions:**\n"
-    f"- Based on the duration of the trip, suggest activities that are relevant to the destination.  give {duration} amount of options: {activities}\n"
-    f"- Include brief descriptions of each activity and links to booking or more details if available.\n\n"
-
     f"**Day-by-Day Itinerary:**\n"
     f"- Create a full detailed day-by-day itinerary based on the trip duration. Include suggested times for activities listed above, when yuou recommend restaurants, pick from the given ones. "
     f"transportation tips, and meal recommendations. When you recommend a actvitity make sure the restaurant for lunch on that day location is close, rememeber, you are given the gps co-ordinates.\n"
@@ -513,6 +501,8 @@ def response():
         "message": "response",
         "details": {
             "response": ai_response,
+            "activities": activities_array,
+            "restaurants": res,
         }
     }
     return jsonify(response)
@@ -570,6 +560,163 @@ def send_email():
     }
     return jsonify(response)
 
+
+@app.route("/register", methods=["POST"])
+def register():
+    data = request.json
+    email = data.get("email")
+    password = data.get("password")
+
+    try:
+        # Check if the user already exists
+        user = auth.get_user_by_email(email)
+        return jsonify({"message": "User already exists, try logging into your account", "uid": user.uid}), 200
+    except auth.UserNotFoundError:
+        # Create new user
+        user = auth.create_user(email=email, password=password)
+        return jsonify({"message": "User created, you can now log in to your account", "uid": user.uid}), 201
+    except Exception as e:
+        return jsonify({"error": str(e)}), 400
+
+@app.route("/login", methods=["POST"])
+def login():
+    data = request.json
+    email = data.get("email")
+    password = data.get("password")
+
+    try:
+        # Since password validation is done client-side, we just fetch user info here
+        user = auth.get_user_by_email(email)
+        return jsonify({"message": f"Hello {user.email}", "uid": user.uid}), 200
+    except auth.UserNotFoundError:
+        return jsonify({"error": "User not found, try registering your account first"}), 400
+    except Exception as e:
+        return jsonify({"error": str(e)}), 400
+    
+
+
+    
+@app.route('/api/save_trip', methods=['POST'])
+def save_trip():
+    try:
+        # Parse the request JSON
+        data = request.json
+        required_fields = ["user_email", "destination_city", "departure_city", "selected_flights", 
+                           "selected_hotel", "restaurants", "activities", "ai_response", "departure_date", "return_date"]
+        print("hello")
+        print(data["ai_response"])
+        # Validate required fields
+        for field in required_fields:
+            if field not in data:
+                print(f"Missing field: {field}")
+                return jsonify({"error": f"Missing required field: {field}"}), 400
+                
+                # Prepare trip data for Firestore
+        h = data["selected_hotel"]
+
+        hotel  = [
+            {
+                "name": h[0],
+                "price": h[1],
+                "website": h[2],
+            }
+        ]
+
+
+        restaurants = [
+            {
+                "name": r[0],
+                "website": r[1],
+                "location": r[2]
+            }
+            for r in data["restaurants"]
+        ]
+
+        activities = [
+            {
+                "name": a[0][0],
+                "website": a[0][1],
+                "location": a[0][2],
+                "additional_info": a[1] if len(a) > 1 else None
+            }
+            for a in data["activities"]
+        ]
+        # Save the transformed data
+        trip_data = {
+            "user_email": data["user_email"],
+            "destination_city": data["destination_city"],
+            "departure_city": data["departure_city"],
+            "selected_flights": data["selected_flights"],
+            "selected_hotel": hotel,
+            "restaurants": restaurants,
+            "activities": activities,
+            "departure_date": data["departure_date"],
+            "return_date": data["return_date"],
+            "ai_response": data["ai_response"],
+            "timestamp": firestore.SERVER_TIMESTAMP
+        }
+
+
+        # Create a new document in the 'trips' collection
+        doc_ref = db.collection('trips').add(trip_data)
+        return jsonify({"message": "Trip saved successfully"}), 200
+            
+    except Exception as e:
+        # Handle errors
+        print("Error:", str(e))
+        return jsonify({"error": str(e)}), 500
+
+@app.route('/api/get_trips', methods=['POST'])
+def get_trips():
+
+    # Get the user email from query parameters
+    user_email = request.json["user_email"]
+    print(user_email)
+    if not user_email:
+        return jsonify({"error": "Missing user_email parameter"}), 400
+    
+    # Query the Firestore collection for trips of the user
+    trips_ref = db.collection('trips')
+    user_trips_query = trips_ref.where('user_email', '==', user_email).stream()
+
+    trips = []
+    for trip in user_trips_query:
+        trip_data = trip.to_dict()
+        trip_data["id"] = trip.id  # Include the document ID for reference
+        trips.append(trip_data)
+
+    if not trips:
+        return jsonify({"message": "No trips found for this user"}), 200
+
+    print("trips", trips)
+    return jsonify({"trips": trips}), 200
+
+
+@app.route('/api/delete_trip', methods=['POST'])
+def delete_trip():
+    try:
+        # Get the document ID from the request
+        document_id = request.json.get("ID")
+        
+        if not document_id:
+            return jsonify({"error": "No document ID provided"}), 400
+
+        # Reference the collection and delete the document
+        trip_ref = db.collection('trips').document(document_id)
+        
+        # Check if the document exists
+        if not trip_ref.get().exists:
+            return jsonify({"error": "Trip not found"}), 404
+
+        # Delete the document
+        trip_ref.delete()
+        
+        print(f"Deleted trip with ID: {document_id}")
+        return jsonify({"message": "Trip deleted successfully"}), 200
+
+    except Exception as e:
+        print(f"Error deleting trip: {e}")
+        return jsonify({"error": "An error occurred while deleting the trip"}), 500
 
 
 if __name__ == '__main__':

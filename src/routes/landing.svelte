@@ -35,7 +35,6 @@
     <h1>Travex</h1>
     <p id="sub-title">Plan your dream vacation in minutes</p>
   </header>
-
-    <a href="/#/input_page" id="start_button">Get Started for Free!</a>
+    <a href="/#/dashboard" id="general_button">Get Started for Free!</a>
 
 </main>
