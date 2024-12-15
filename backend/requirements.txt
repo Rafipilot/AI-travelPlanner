@@ -11,3 +11,4 @@ flask_cors
 gunicorn
 python-dotenv
 markdown2
+firebase_admin
