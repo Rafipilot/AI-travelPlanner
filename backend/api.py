@@ -570,7 +570,7 @@ def register():
     try:
         # Check if the user already exists
         user = auth.get_user_by_email(email)
-        return jsonify({"message": "User already exists", "uid": user.uid}), 400
+        return jsonify({"message": "User already exists, try logging into your account", "uid": user.uid}), 200
     except auth.UserNotFoundError:
         # Create new user
         user = auth.create_user(email=email, password=password)

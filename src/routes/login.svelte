@@ -463,11 +463,13 @@ async function delete_trip()  {
   }
 
   const registerUser = async () => {
+    isLoading = true
     try {
       const response = await axios.post('http://localhost:5000/register', {
         email,
         password
       });
+      isLoading = false
       message = response.data.message;
     } catch (error) {
       message = error.response.data.error;
@@ -475,6 +477,7 @@ async function delete_trip()  {
   };
 
   const loginUser = async () => {
+    isLoading = true
     try {
       const response = await axios.post('http://localhost:5000/login', {
         email,
@@ -484,6 +487,7 @@ async function delete_trip()  {
       user.set(response.data);  // Set the user data in the store
       get_trips()
       isLoggedIn = true;
+      isLoading = false;
       show_dashboard = true;
       
     } catch (error) {
@@ -664,7 +668,7 @@ async function delete_trip()  {
     
     {#if aiResponsePage && !isLoading}
     <div id="responsePage">
-      <h1>Your Trip</h1>
+      <h1 id="">Your Trip</h1>
       
       <button on:click={saveTrip} id="general_button">Save Trip</button>
       <button on:click={delete_trip} id="general_button">Delete Trip</button>
