@@ -273,7 +273,7 @@ async function GPT_response() {
 
   isLoading = true;
   try {
-    const response = await fetch("http://127.0.0.1:5000/api/second_step", {
+    const response = await fetch("https://my-svelte-project.onrender.com/api/second_step", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify(data),
@@ -313,7 +313,7 @@ async function saveTrip() {
   };
 
   try {
-    const response = await fetch("http://127.0.0.1:5000/api/save_trip", {
+    const response = await fetch("https://my-svelte-project.onrender.com/api/save_trip", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify(tripData)
@@ -336,7 +336,7 @@ async function get_trips_and_return_to_dashboard() {
   }
 
   try {
-    const response = await fetch("http://127.0.0.1:5000/api/get_trips", {
+    const response = await fetch("https://my-svelte-project.onrender.com/api/get_trips", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify(user_data)
@@ -370,7 +370,7 @@ async function get_trips()  {
   }
 
   try {
-    const response = await fetch("http://127.0.0.1:5000/api/get_trips", {
+    const response = await fetch("https://my-svelte-project.onrender.com/api/get_trips", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify(user_data)
@@ -396,7 +396,7 @@ async function delete_trip()  {
   }
 
   try {
-    const response = await fetch("http://127.0.0.1:5000/api/delete_trip", {
+    const response = await fetch("https://my-svelte-project.onrender.com/api/delete_trip", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify(user_data)
@@ -465,7 +465,7 @@ async function delete_trip()  {
   const registerUser = async () => {
     isLoading = true
     try {
-      const response = await axios.post('http://localhost:5000/register', {
+      const response = await axios.post('https://my-svelte-project.onrender.com/register', {
         email,
         password
       });
@@ -479,7 +479,7 @@ async function delete_trip()  {
   const loginUser = async () => {
     isLoading = true
     try {
-      const response = await axios.post('http://localhost:5000/login', {
+      const response = await axios.post('https://my-svelte-project.onrender.com/login', {
         email,
         password
       });
