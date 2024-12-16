@@ -472,6 +472,7 @@ async function delete_trip()  {
       isLoading = false
       message = response.data.message;
     } catch (error) {
+      isLoading = false;
       message = error.response.data.error;
     }
   };
@@ -491,6 +492,7 @@ async function delete_trip()  {
       show_dashboard = true;
       
     } catch (error) {
+      isLoading = false;
       message = error.response.data.error;
     }
   };
