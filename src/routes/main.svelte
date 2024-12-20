@@ -463,6 +463,10 @@ async function delete_trip()  {
   }
 
   const registerUser = async () => {
+    if (password.length < 6) {
+    message = "Password must be at least 6 characters long";
+    return;
+  }
     isLoading = true
     try {
       const response = await axios.post('https://my-svelte-project.onrender.com/register', {
