@@ -39,9 +39,9 @@
     <a href="/#/dashboard" id="general_button">Get Started for Free!</a>
 
     <div id="start_img">
-      <img src="public\pic_it.png">
-      <img src="public\pic_demo.png">
-      <img src="public/pic_demo2.png">
+      <img src="pic_it.png">
+      <img src="pic_demo.png">
+      <img src="pic_demo2.png">
     </div>
 
 </main>
