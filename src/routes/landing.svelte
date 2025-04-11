@@ -34,7 +34,14 @@
   <header>
     <h1>Travex</h1>
     <p id="sub-title">Plan your dream vacation in minutes</p>
+
   </header>
     <a href="/#/dashboard" id="general_button">Get Started for Free!</a>
+
+    <div id="start_img">
+      <img src="public\pic_it.png">
+      <img src="public\pic_demo.png">
+      <img src="public/pic_demo2.png">
+    </div>
 
 </main>
