@@ -468,6 +468,7 @@ async function delete_trip()  {
     return;
   }
     isLoading = true
+    email = email.toLowerCase()
     try {
       const response = await axios.post('https://my-svelte-project.onrender.com/register', {
         email,
@@ -483,6 +484,7 @@ async function delete_trip()  {
 
   const loginUser = async () => {
     isLoading = true
+    email = email.toLowerCase()
     try {
       const response = await axios.post('https://my-svelte-project.onrender.com/login', {
         email,
