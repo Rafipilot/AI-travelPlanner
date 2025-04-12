@@ -638,7 +638,7 @@ async function delete_trip()  {
     
       {#if hotelPage && !isLoading}
       <div id="hotelPage">
-        <h1>Select a Hotel</h1>
+        <h1>Best Hotels for your budget, please select one!</h1>
         {#if availableHotels && availableHotels.length > 0}
           <ul id="hotelList">
             {#each availableHotels as hotel, index}
@@ -702,7 +702,7 @@ async function delete_trip()  {
         
         <!-- Hotels Section -->
         <div id="hotels" class="infoBox">
-          <h3 class="sectionHeader">Hotels</h3>
+          <h3 class="sectionHeader">Hotel</h3>
           <div class="infoContent">
             <h4>{selectedHotel[0]}</h4>
             <p><strong>Price(Per Night):</strong> ${selectedHotel[1]}</p>
@@ -712,7 +712,7 @@ async function delete_trip()  {
         
         <!-- Activities Section -->
         <div id="activities" class="infoBox">
-          <h3 class="sectionHeader">Activities</h3>
+          <h3 class="sectionHeader">Recommended Activities</h3>
           <div class="infoContent">
             <ul class="scrollable-list">
               {#each activities as activity}
